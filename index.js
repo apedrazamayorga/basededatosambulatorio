@@ -7,7 +7,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function fetchData() {
   const { data, error } = await supabase
-    .from('nombre_de_tu_tabla')
+    .from('Reportes')
     .select('*');
 
   if (error) {
@@ -20,8 +20,8 @@ async function fetchData() {
 
 async function createChart() {
   const data = await fetchData();
-  const labels = data.map(item => item.nombre_columna_x); // Cambia por tu columna
-  const values = data.map(item => item.nombre_columna_y); // Cambia por tu columna
+  const labels = data.map(item => item.procedimientos); // Cambia por tu columna
+  const values = data.map(item => item.fecha); // Cambia por tu columna
 
   const ctx = document.getElementById('myChart').getContext('2d');
   new Chart(ctx, {
