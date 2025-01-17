@@ -17,8 +17,8 @@ h1 {
 
 /* Centrar los gráficos y agregar espacio */
 canvas {
-  width: 800px;
-  height: 500px;
+  width: 1200px;
+  height: 600px;
   margin: 20px auto;
   display: block;
 }
@@ -27,8 +27,6 @@ canvas {
 div {
   margin: 0 auto;
   padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
-  border-radius: 8px;
   max-width: 100%;
 }
