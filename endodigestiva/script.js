@@ -103,8 +103,8 @@ function crearGraficoSemanal(datos) {
           borderColor: "rgba(75, 192, 192, 1)",
           backgroundColor: "rgba(75, 192, 192, 0.2)",
           tension: 0.3,
-          pointRadius: 5,
-          pointHoverRadius: 8,
+          pointRadius: 10,
+          pointHoverRadius: 20,
         },
         {
           label: "Gastroduodenoscopias",
@@ -112,8 +112,8 @@ function crearGraficoSemanal(datos) {
           borderColor: "rgba(255, 99, 132, 1)",
           backgroundColor: "rgba(255, 99, 132, 0.2)",
           tension: 0.3,
-          pointRadius: 5,
-          pointHoverRadius: 8,
+          pointRadius: 10,
+          pointHoverRadius: 20,
         },
       ],
     },
@@ -140,13 +140,13 @@ function crearGraficoMensual(datos) {
           label: "Colonoscopias",
           data: datos.colonoscopias,
           backgroundColor: "rgba(75, 192, 192, 1)",
-          barThickness: 10,  // Ajustar grosor de las barras (más delgadas)
+          barThickness: 20,  // Ajustar grosor de las barras (más delgadas)
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
           backgroundColor: "rgba(255, 99, 132, 1)",
-          barThickness: 10,  // Ajustar grosor de las barras (más delgadas)
+          barThickness: 20,  // Ajustar grosor de las barras (más delgadas)
         },
       ],
     },
@@ -157,7 +157,7 @@ function crearGraficoMensual(datos) {
         x: {
           stacked: true,  // Apilamiento de las barras
           beginAtZero: true,
-          barPercentage: 0.5,  // Reducir el porcentaje de la barra (más delgadas)
+          barPercentage: 0.8,  // Reducir el porcentaje de la barra (más delgadas)
           categoryPercentage: 0.4,  // Reducir espacio entre las barras
         },
         // Eje Y (valores)
@@ -165,7 +165,7 @@ function crearGraficoMensual(datos) {
           stacked: true,
           beginAtZero: true,
           ticks: {
-            maxTicksLimit: 5,  // Limitar el número de ticks en el eje Y
+            maxTicksLimit: 10,  // Limitar el número de ticks en el eje Y
           },
         },
       },
