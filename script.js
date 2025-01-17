@@ -77,64 +77,98 @@ function formatearDatos(datos) {
   };
 }
 
-// Graficar con Chart.js (ajuste para gráfico de líneas)
-function graficar(canvasId, datos, titulo) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
+// Datos de ejemplo (semanas con formato 'Enero S01', 'Enero S02', etc.)
+const datosSemana = {
+  labels: [
+    "Enero S01", "Enero S02", "Enero S03", "Enero S04", 
+    "Febrero S01", "Febrero S02", "Febrero S03", "Febrero S04"
+  ],
+  valores: [10, 15, 12, 9, 20, 25, 30, 35]
+};
+
+// Graficar con Chart.js
+function graficar() {
+  const ctx = document.getElementById("chartSemana").getContext("2d");
+
+  const minValor = Math.min(...datosSemana.valores);  // Mínimo valor
+  const maxValor = Math.max(...datosSemana.valores);  // Máximo valor
+
   new Chart(ctx, {
-    type: "line",  // Cambio a tipo línea
+    type: "line",
     data: {
-      labels: datos.labels,
-      datasets: [
-        {
-          label: titulo,
-          data: datos.valores,
-          backgroundColor: "rgba(75, 192, 192, 0.2)",
-          borderColor: "rgba(75, 192, 192, 1)",
-          borderWidth: 1,
-          fill: false,  // Desactivar el relleno bajo la línea
-        },
-        {
-          label: "Tendencia",
-          data: calcularTendencia(datos.valores),
-          borderColor: "rgba(255, 99, 132, 1)",  // Línea de tendencia en rojo
-          borderWidth: 2,
-          fill: false,  // Desactivar el relleno bajo la línea
-          borderDash: [5, 5],  // Línea de tendencia discontinua
-        }
-      ],
+      labels: datosSemana.labels,
+      datasets: [{
+        label: 'Colonoscopias por Semana',
+        data: datosSemana.valores,
+        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        fill: false,
+        borderWidth: 2
+      }],
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: "top",
-        },
+        legend: { position: "top" },
         title: {
           display: true,
-          text: titulo,
+          text: "Colonoscopias por Semana",
+          color: "#000",
+          align: "start",
         },
       },
       scales: {
         y: {
-          beginAtZero: true,
+          beginAtZero: false,
+          min: minValor - 5, // Límites ajustados
+          max: maxValor + 5, // Límites ajustados
+          ticks: {
+            color: '#000',
+          },
+          grid: {
+            color: 'rgba(255, 0, 0, 0.2)',  // Línea horizontal en rojo pálido
+            lineWidth: 1,
+          },
         },
+      },
+      annotation: {
+        annotations: [
+          {
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y',
+            value: minValor,
+            borderColor: 'rgba(255, 99, 132, 0.5)',
+            borderWidth: 2,
+            label: {
+              enabled: true,
+              content: `Min: ${minValor}`,
+              position: 'left',
+              backgroundColor: 'rgba(255, 99, 132, 0.5)',
+              font: { color: '#000', size: 12 },
+            },
+          },
+          {
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y',
+            value: maxValor,
+            borderColor: 'rgba(255, 99, 132, 0.5)',
+            borderWidth: 2,
+            label: {
+              enabled: true,
+              content: `Max: ${maxValor}`,
+              position: 'left',
+              backgroundColor: 'rgba(255, 99, 132, 0.5)',
+              font: { color: '#000', size: 12 },
+            },
+          },
+        ],
       },
     },
   });
 }
 
-// Calcular la línea de tendencia (promedio móvil)
-function calcularTendencia(valores) {
-  let tendencia = [];
-  for (let i = 0; i < valores.length; i++) {
-    if (i === 0) {
-      tendencia.push(valores[i]);
-    } else {
-      tendencia.push((valores[i] + valores[i - 1]) / 2);  // Promedio simple de los valores consecutivos
-    }
-  }
-  return tendencia;
-}
-
-// Llamar a la función principal
-obtenerDatos();
+// Llamamos a la función para graficar
+graficar();
