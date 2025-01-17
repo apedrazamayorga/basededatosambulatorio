@@ -118,7 +118,6 @@ function graficar(canvasId, datos, titulo) {
   });
 }
 
-
 // Calcular la línea de tendencia (promedio móvil)
 function calcularTendencia(valores) {
   let tendencia = [];
