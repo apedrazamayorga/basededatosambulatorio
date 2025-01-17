@@ -17,15 +17,26 @@ async function obtenerDatos() {
 }
 
 function procesarDatos(data) {
-  const semanas = {};
+  const semanas = { colonoscopia: {}, gastroduodenoscopia: {} };
+
   data.forEach(item => {
     const fecha = new Date(item.fecha);
     const semana = obtenerSemanaDelAno(fecha);
-    semanas[semana] = (semanas[semana] || 0) + item.tipo_procedimiento;
+
+    // Contar por tipo de procedimiento
+    if (item.tipo_procedimiento === "colonoscopia") {
+      semanas.colonoscopia[semana] = (semanas.colonoscopia[semana] || 0) + 1;
+    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+      semanas.gastroduodenoscopia[semana] = (semanas.gastroduodenoscopia[semana] || 0) + 1;
+    }
   });
 
-  const datosOrdenados = formatearDatosCronologicamente(semanas);
-  graficar(datosOrdenados, "Colonoscopias por Semana");
+  // Formatear y graficar para cada tipo de procedimiento
+  const datosColonoscopia = formatearDatosCronologicamente(semanas.colonoscopia);
+  const datosGastroduodenoscopia = formatearDatosCronologicamente(semanas.gastroduodenoscopia);
+
+  graficar(datosColonoscopia, "Colonoscopias por Semana");
+  graficar(datosGastroduodenoscopia, "Gastroduodenoscopias por Semana");
 }
 
 function formatearDatosCronologicamente(datos) {
