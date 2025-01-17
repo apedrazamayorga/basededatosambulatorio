@@ -90,44 +90,45 @@ function procesarDatosTrimestrales(data) {
   return { labels, colonoscopias, gastroduodenoscopias };
 }
 
-function crearGraficoMensual(datos) {
-  const ctx = document.getElementById("chartMensual").getContext("2d");
+function crearGraficoSemanal(datos) {
+  const ctx = document.getElementById("chartSemana").getContext("2d");
   new Chart(ctx, {
-    type: "horizontalBar",  // Usamos "bar" para barras
+    type: "line", // Tipo de gráfico (línea)
     data: {
       labels: datos.labels,
       datasets: [
         {
           label: "Colonoscopias",
           data: datos.colonoscopias,
-          backgroundColor: "rgba(75, 192, 192, 1)",
-          barThickness: 12,  // Ajustamos el grosor de las barras
+          borderColor: "rgba(75, 192, 192, 1)",
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 8,
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
-          backgroundColor: "rgba(255, 99, 132, 1)",
-          barThickness: 12,  // Ajustamos el grosor de las barras
+          borderColor: "rgba(255, 99, 132, 1)",
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 8,
         },
       ],
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
-        x: {
-          stacked: true,
-          beginAtZero: true,
-          barPercentage: 0.5,  // Reduce el ancho de las barras
-          categoryPercentage: 0.5,  // Reduce el espacio entre las barras
-        },
         y: {
-          stacked: true,
           beginAtZero: true,
         },
       },
     },
   });
 }
+
 
 function crearGraficoTrimestral(datos) {
   const ctx = document.getElementById("chartTrimestre").getContext("2d");
