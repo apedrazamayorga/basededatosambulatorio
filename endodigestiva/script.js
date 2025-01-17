@@ -132,7 +132,7 @@ function crearGraficoSemanal(datos) {
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
   new Chart(ctx, {
-    type: "bar",  // Tipo de gráfico
+    type: "horizontalbar",  // Mantener tipo "bar" para barras horizontales
     data: {
       labels: datos.labels,
       datasets: [
@@ -140,28 +140,33 @@ function crearGraficoMensual(datos) {
           label: "Colonoscopias",
           data: datos.colonoscopias,
           backgroundColor: "rgba(75, 192, 192, 1)",
-          barThickness: 12,  // Ajustamos el grosor de las barras
+          barThickness: 10,  // Ajustar grosor de las barras (más delgadas)
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
           backgroundColor: "rgba(255, 99, 132, 1)",
-          barThickness: 12,  // Ajustamos el grosor de las barras
+          barThickness: 10,  // Ajustar grosor de las barras (más delgadas)
         },
       ],
     },
     options: {
       responsive: true,
       scales: {
+        // Eje X (horizontales, representando las categorías)
         x: {
-          stacked: true,
+          stacked: true,  // Apilamiento de las barras
           beginAtZero: true,
-          barPercentage: 0.5,  // Reduce el ancho de las barras
-          categoryPercentage: 0.5,  // Reduce el espacio entre las barras
+          barPercentage: 0.5,  // Reducir el porcentaje de la barra (más delgadas)
+          categoryPercentage: 0.4,  // Reducir espacio entre las barras
         },
+        // Eje Y (valores)
         y: {
           stacked: true,
           beginAtZero: true,
+          ticks: {
+            maxTicksLimit: 5,  // Limitar el número de ticks en el eje Y
+          },
         },
       },
     },
