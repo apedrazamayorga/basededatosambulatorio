@@ -132,7 +132,7 @@ function crearGraficoSemanal(datos) {
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
   new Chart(ctx, {
-    type: "bar",  // Usamos "bar" para barras
+    type: "bar",  // Tipo de gráfico
     data: {
       labels: datos.labels,
       datasets: [
