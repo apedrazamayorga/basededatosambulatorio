@@ -1,0 +1,33 @@
+/* Estilo para el cuerpo de la página */
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #ffffff;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+/* Estilo para los encabezados */
+h1, h2, h3 {
+  color: #000000;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+/* Centrar los gráficos y agregar espacio */
+canvas {
+  margin: 20px auto;
+  display: block;
+  width: 100%;
+  max-width: 1200px; /* Ancho máximo para escritorio */
+  height: 100%;
+  max-height: 400px; /* Altura fija */
+}
+/* Contenedor de gráficos */
+div {
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  max-width: 100%;
+}
