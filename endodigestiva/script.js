@@ -93,7 +93,7 @@ function procesarDatosTrimestrales(data) {
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
   new Chart(ctx, {
-    type: "bar",  // Usamos "bar" para barras
+    type: "horizontalBar",  // Usamos "bar" para barras
     data: {
       labels: datos.labels,
       datasets: [
@@ -132,7 +132,7 @@ function crearGraficoMensual(datos) {
 function crearGraficoTrimestral(datos) {
   const ctx = document.getElementById("chartTrimestre").getContext("2d");
   new Chart(ctx, {
-    type: "horizontalBar",
+    type: "Bar",
     data: {
       labels: datos.labels,
       datasets: [
