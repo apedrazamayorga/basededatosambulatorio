@@ -1,9 +1,9 @@
 /* Estilo general para el contenedor de cada gráfico */
 .chart-container {
-  margin: 20px auto; /* Añade margen para separar los gráficos */
+  margin: 50px auto; /* Añade margen para separar los gráficos */
   width: 80%; /* Puedes ajustar el ancho de los gráficos */
   max-width: 800px; /* Limita el tamaño máximo de los gráficos */
-  height: 400px; /* Ajusta la altura del gráfico */
+  height: 300px; /* Ajusta la altura del gráfico */
 }
 
 /* Asegúrate de que cada canvas (gráfico) ocupe el 100% del contenedor */
