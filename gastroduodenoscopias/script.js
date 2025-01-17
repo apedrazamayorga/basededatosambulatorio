@@ -21,7 +21,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     function procesarDatosSemanaEndoscopia(data) {
       const semanas = {};
       data.forEach(item => {
-        if (item.tipo_procedimiento === 'Gastroduodenoscopia') {
+        if (item.tipo_procedimiento === 'gastroduodenoscopia') {
           const fecha = new Date(item.fecha);
           const semana = obtenerSemanaDelAno(fecha);
           semanas[semana] = (semanas[semana] || 0) + 1;
@@ -46,7 +46,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     function procesarDatosMensualEndoscopia(data) {
       const meses = {};
       data.forEach(item => {
-        if (item.tipo_procedimiento === 'Gastroduodenoscopia') {
+        if (item.tipo_procedimiento === 'gastroduodenoscopia') {
           const fecha = new Date(item.fecha);
           const mes = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
           meses[mes] = (meses[mes] || 0) + 1;
@@ -73,7 +73,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     function procesarDatosTrimestreEndoscopia(data) {
       const trimestres = {};
       data.forEach(item => {
-        if (item.tipo_procedimiento === 'Gastroduodenoscopia') {
+        if (item.tipo_procedimiento === 'gastroduodenoscopia') {
           const fecha = new Date(item.fecha);
           const trimestre = obtenerTrimestre(fecha);
           trimestres[trimestre] = (trimestres[trimestre] || 0) + 1;
