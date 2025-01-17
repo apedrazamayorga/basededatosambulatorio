@@ -3,57 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gráfico desde Supabase</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <title>Colonoscopias por Periodo</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Gráfico de datos</h1>
-  <canvas id="myChart" width="400" height="200"></canvas>
-  <script>
-    // Conexión a Supabase
-    const supabaseUrl = 'https://[tu-supabase-url].supabase.co';
-    const supabaseKey = '[tu-anon-key]';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  <h1>Gráficos de Colonoscopias</h1>
 
-    async function renderChart() {
-      // Obtener datos de Supabase
-      const { data, error } = await supabase
-        .from('datos')
-        .select('*');
+  <h2>Colonoscopias por Semana</h2>
+  <canvas id="chartSemana" width="400" height="200"></canvas>
 
-      if (error) {
-        console.error('Error al obtener datos:', error);
-        return;
-      }
+  <h2>Colonoscopias por Mes</h2>
+  <canvas id="chartMes" width="400" height="200"></canvas>
 
-      // Extraer etiquetas y valores
-      const labels = data.map(item => item.label);
-      const values = data.map(item => item.value);
+  <h2>Colonoscopias por Trimestre</h2>
+  <canvas id="chartTrimestre" width="400" height="200"></canvas>
 
-      // Crear el gráfico
-      const ctx = document.getElementById('myChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Valores',
-            data: values,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-
-    renderChart();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
