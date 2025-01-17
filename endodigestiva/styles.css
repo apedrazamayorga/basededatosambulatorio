@@ -1,16 +1,23 @@
-/* Estilo general para el contenedor del gráfico */
+/* Estilo general para el contenedor de cada gráfico */
 .chart-container {
-  position: relative;
-  height: 400px; /* Ajusta la altura según el tamaño que desees */
-  width: 80%; /* Ajusta el ancho según lo necesites */
-  margin: 0 auto; /* Centra los gráficos */
+  margin: 20px auto; /* Añade margen para separar los gráficos */
+  width: 80%; /* Puedes ajustar el ancho de los gráficos */
+  max-width: 800px; /* Limita el tamaño máximo de los gráficos */
+  height: 400px; /* Ajusta la altura del gráfico */
 }
 
-/* Estilo para los gráficos */
+/* Asegúrate de que cada canvas (gráfico) ocupe el 100% del contenedor */
 canvas {
   display: block;
-  width: 100% !important; /* Asegura que el gráfico ocupe todo el espacio del contenedor */
-  height: 100% !important; /* Asegura que el gráfico ocupe toda la altura del contenedor */
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Si usas flexbox, puedes añadir más control a la disposición */
+.chart-row {
+  display: flex;
+  flex-direction: column; /* Apila los gráficos verticalmente */
+  gap: 30px; /* Espacio entre los gráficos */
 }
 
 /* Estilo para los títulos */
