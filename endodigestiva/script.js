@@ -23,6 +23,27 @@ async function obtenerDatos() {
   crearGraficoTrimestral(datosTrimestrales);
 }
 
+function procesarDatosSemanales(data) {
+  const resumenSemanal = Array(52).fill(0).map(() => ({ colonoscopias: 0, gastroduodenoscopias: 0 }));
+
+  data.forEach((item) => {
+    const fecha = new Date(item.fecha);
+    const semana = Math.floor((fecha.getTime() - new Date(fecha.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
+
+    if (item.tipo_procedimiento === "colonoscopia") {
+      resumenSemanal[semana].colonoscopias++;
+    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+      resumenSemanal[semana].gastroduodenoscopias++;
+    }
+  });
+
+  const labels = resumenSemanal.map((_, i) => `Semana ${i + 1}`);
+  const colonoscopias = resumenSemanal.map((semana) => semana.colonoscopias);
+  const gastroduodenoscopias = resumenSemanal.map((semana) => semana.gastroduodenoscopias);
+
+  return { labels, colonoscopias, gastroduodenoscopias };
+}
+
 function procesarDatosMensuales(data) {
   const resumenMensual = {};
 
@@ -48,6 +69,66 @@ function procesarDatosMensuales(data) {
   return { labels, colonoscopias, gastroduodenoscopias };
 }
 
+function procesarDatosTrimestrales(data) {
+  const resumenTrimestral = [0, 1, 2, 3].map(() => ({ colonoscopias: 0, gastroduodenoscopias: 0 }));
+
+  data.forEach((item) => {
+    const fecha = new Date(item.fecha);
+    const trimestre = Math.floor(fecha.getMonth() / 3);
+
+    if (item.tipo_procedimiento === "colonoscopia") {
+      resumenTrimestral[trimestre].colonoscopias++;
+    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+      resumenTrimestral[trimestre].gastroduodenoscopias++;
+    }
+  });
+
+  const labels = ["Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"];
+  const colonoscopias = resumenTrimestral.map((trimestre) => trimestre.colonoscopias);
+  const gastroduodenoscopias = resumenTrimestral.map((trimestre) => trimestre.gastroduodenoscopias);
+
+  return { labels, colonoscopias, gastroduodenoscopias };
+}
+
+function crearGraficoSemanal(datos) {
+  const ctx = document.getElementById("chartSemana").getContext("2d");
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: datos.labels,
+      datasets: [
+        {
+          label: "Colonoscopias",
+          data: datos.colonoscopias,
+          borderColor: "rgba(75, 192, 192, 1)",
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+        },
+        {
+          label: "Gastroduodenoscopias",
+          data: datos.gastroduodenoscopias,
+          borderColor: "rgba(255, 99, 132, 1)",
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
   new Chart(ctx, {
@@ -71,10 +152,10 @@ function crearGraficoMensual(datos) {
       responsive: true,
       scales: {
         x: {
-          stacked: true, // Habilitar apilamiento en el eje X
+          stacked: true,
         },
         y: {
-          stacked: true, // Habilitar apilamiento en el eje Y
+          stacked: true,
           beginAtZero: true,
         },
       },
