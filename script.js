@@ -77,27 +77,34 @@ function formatearDatos(datos) {
   };
 }
 
-// Graficar con Chart.js (ajuste sin la línea de tendencia)
+// Graficar con Chart.js (ajuste para gráfico de líneas)
 function graficar(canvasId, datos, titulo) {
   const ctx = document.getElementById(canvasId).getContext("2d");
   new Chart(ctx, {
-    type: "line",  // Tipo de gráfico: línea
+    type: "line",  // Cambio a tipo línea
     data: {
       labels: datos.labels,
       datasets: [
         {
           label: titulo,
           data: datos.valores,
-          backgroundColor: "rgba(75, 192, 192, 0.2)",  // Color de fondo
-          borderColor: "rgba(75, 192, 192, 1)",  // Color del borde
-          borderWidth: 2,
-          fill: false,  // Sin relleno bajo la línea
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          borderColor: "rgba(75, 192, 192, 1)",
+          borderWidth: 1,
+          fill: false,  // Desactivar el relleno bajo la línea
         },
+        {
+          label: "Tendencia",
+          data: calcularTendencia(datos.valores),
+          borderColor: "rgba(255, 99, 132, 1)",  // Línea de tendencia en rojo
+          borderWidth: 2,
+          fill: false,  // Desactivar el relleno bajo la línea
+          borderDash: [5, 5],  // Línea de tendencia discontinua
+        }
       ],
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,  // Ajusta el gráfico al tamaño de la pantalla
       plugins: {
         legend: {
           position: "top",
@@ -105,8 +112,6 @@ function graficar(canvasId, datos, titulo) {
         title: {
           display: true,
           text: titulo,
-          color: "#000",  // Título en negro
-          align: "start",  // Justificado a la izquierda
         },
       },
       scales: {
