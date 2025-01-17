@@ -26,7 +26,7 @@ function procesarDatos(data) {
   });
 
   const datosOrdenados = formatearDatosCronologicamente(semanas);
-  graficar(datosOrdenados, "Colonoscopias por Semana");
+  graficar(datosOrdenados, "Colonoscopias");
 }
 
 function formatearDatosCronologicamente(datos) {
