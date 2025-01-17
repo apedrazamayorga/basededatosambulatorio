@@ -4,8 +4,6 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let chartSemana, chartMensual, chartTrimestre; // Variables para los gráficos
-
 async function obtenerDatos() {
   const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
 
@@ -32,7 +30,7 @@ function procesarDatosSemana(data) {
   const valores = etiquetas.map(semana => semanas[semana]);
 
   graficar({
-    ctx: document.getElementById("chartSemana"),
+    ctx: document.getElementById("chartSemana").getContext("2d"),
     etiquetas,
     valores,
     titulo: "Colonoscopias por Semana",
@@ -53,7 +51,7 @@ function procesarDatosMensual(data) {
 
   // Crear gráfico
   graficar({
-    ctx: document.getElementById("chartMensual"),
+    ctx: document.getElementById("chartMensual").getContext("2d"),
     etiquetas,
     valores,
     titulo: "Colonoscopias por Mes",
@@ -93,7 +91,7 @@ function procesarDatosTrimestre(data) {
   const valores = etiquetas.map(trimestre => trimestres[trimestre]);
 
   graficar({
-    ctx: document.getElementById("chartTrimestre"),
+    ctx: document.getElementById("chartTrimestre").getContext("2d"),
     etiquetas,
     valores,
     titulo: "Colonoscopias por Trimestre",
@@ -107,11 +105,7 @@ function graficar({ ctx, etiquetas, valores, titulo }) {
   const suggestedMin = Math.floor(minValor / 10) * 10;
   const suggestedMax = Math.ceil(maxValor / 10) * 10;
 
-  if (ctx.chart) {
-    ctx.chart.destroy(); // Destruir gráfico existente si hay uno
-  }
-
-  ctx.chart = new Chart(ctx, {
+  new Chart(ctx, {
     type: "line",
     data: {
       labels: etiquetas,
@@ -121,18 +115,20 @@ function graficar({ ctx, etiquetas, valores, titulo }) {
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.3,
-        pointRadius: valores.map(valor => Math.max(valor / 5, 3)),
-        pointHoverRadius: valores.map(valor => Math.max(valor / 5, 5)),
+        pointRadius: valores.map(valor => Math.max(valor / 10, 3)),
+        pointHoverRadius: valores.map(valor => Math.max(valor / 10, 5)),
         pointBackgroundColor: "rgba(75, 192, 192, 1)",
       }],
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: true,
       scales: {
         x: {
           ticks: {
-            autoSkip: false,
+            autoSkip: true,
+            maxRotation: 0,
+            minRotation: 0,
           },
         },
         y: {
@@ -159,5 +155,7 @@ function obtenerTrimestre(fecha) {
   const trimestre = Math.floor(month / 3) + 1;
   return `Q${trimestre} ${year}`;
 }
+
+obtenerDatos();
 
 obtenerDatos();
