@@ -4,151 +4,156 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function obtenerDatos() {
-  const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
+  async function obtenerDatos() {
+      const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
 
-  if (error) {
-    console.error("Error al obtener datos:", error);
-    return;
-  }
+      if (error) {
+        console.error("Error al obtener datos:", error);
+        return;
+      }
 
-  procesarDatosSemana(data);
-  procesarDatosMensual(data);
-  procesarDatosTrimestre(data);
-}
+      procesarDatosSemana(data);
+      procesarDatosMensual(data);
+      procesarDatosTrimestre(data);
+    }
 
-// Gráfico semanal (líneas)
-function procesarDatosSemana(data) {
-  const semanas = {};
-  data.forEach(item => {
-    const fecha = new Date(item.fecha);
-    const semana = obtenerSemanaDelAno(fecha);
-    semanas[semana] = (semanas[semana] || 0) + 1;
-  });
+    // Gráfico semanal (líneas)
+    function procesarDatosSemana(data) {
+      const semanas = {};
+      data.forEach(item => {
+        const fecha = new Date(item.fecha);
+        const semana = obtenerSemanaDelAno(fecha);
+        semanas[semana] = (semanas[semana] || 0) + 1;
+      });
 
-  const etiquetas = Object.keys(semanas).sort((a, b) => parseInt(a.replace("S", ""), 10) - parseInt(b.replace("S", ""), 10));
-  const valores = etiquetas.map(semana => semanas[semana]);
+      const etiquetas = Object.keys(semanas).sort((a, b) => parseInt(a.replace("S", ""), 10) - parseInt(b.replace("S", ""), 10));
+      const valores = etiquetas.map(semana => semanas[semana]);
 
-  graficar({
-    ctx: document.getElementById("chartSemana").getContext("2d"),
-    etiquetas,
-    valores,
-    tipo: "line",
-    titulo: "Colonoscopias por Semana",
-  });
-}
+      graficar({
+        ctx: document.getElementById("chartSemana").getContext("2d"),
+        etiquetas,
+        valores,
+        tipo: "line",
+        titulo: "Colonoscopias por Semana",
+        tipoPunto: "circle", // Círculo como marcador
+        efectoPunto: "grow", // Crecer al pasar el mouse
+      });
+    }
 
-// Gráfico mensual (barras horizontales)
-function procesarDatosMensual(data) {
-  const meses = {};
-  data.forEach(item => {
-    const fecha = new Date(item.fecha);
-    const mes = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
-    meses[mes] = (meses[mes] || 0) + 1;
-  });
+    // Gráfico mensual (barras horizontales más angostas con número dentro)
+    function procesarDatosMensual(data) {
+      const meses = {};
+      data.forEach(item => {
+        const fecha = new Date(item.fecha);
+        const mes = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
+        meses[mes] = (meses[mes] || 0) + 1;
+      });
 
-  const etiquetas = Object.keys(meses).sort();
-  const valores = etiquetas.map(mes => meses[mes]);
+      const etiquetas = Object.keys(meses).sort();
+      const valores = etiquetas.map(mes => meses[mes]);
 
-  // Crear gráfico
-  graficar({
-    ctx: document.getElementById("chartMensual").getContext("2d"),
-    etiquetas,
-    valores,
-    tipo: "bar",
-    titulo: "Colonoscopias por Mes",
-    orientacion: "horizontal", // Orientación horizontal
-  });
+      // Crear gráfico
+      graficar({
+        ctx: document.getElementById("chartMensual").getContext("2d"),
+        etiquetas,
+        valores,
+        tipo: "bar",
+        titulo: "Colonoscopias por Mes",
+        orientacion: "horizontal", // Orientación horizontal
+        barraAngosta: true, // Barras más angostas
+        mostrarNumeroDentro: true, // Mostrar número dentro de la barra
+      });
+    }
 
-  // Llenar tabla acumulativa
-  llenarTablaMensual(etiquetas, valores);
-}
+    // Gráfico trimestral (barras verticales más angostas)
+    function procesarDatosTrimestre(data) {
+      const trimestres = {};
+      data.forEach(item => {
+        const fecha = new Date(item.fecha);
+        const trimestre = obtenerTrimestre(fecha);
+        trimestres[trimestre] = (trimestres[trimestre] || 0) + 1;
+      });
 
-// Tabla acumulativa mensual
-function llenarTablaMensual(etiquetas, valores) {
-  const tbody = document.getElementById("tablaMensual");
-  tbody.innerHTML = ""; // Limpiar la tabla
+      const etiquetas = Object.keys(trimestres).sort();
+      const valores = etiquetas.map(trimestre => trimestres[trimestre]);
 
-  let acumulativo = 0;
-  etiquetas.forEach((etiqueta, index) => {
-    acumulativo += valores[index];
-    const fila = `<tr>
-      <td>${etiqueta}</td>
-      <td>${valores[index]}</td>
-      <td>${acumulativo}</td>
-    </tr>`;
-    tbody.innerHTML += fila;
-  });
-}
+      graficar({
+        ctx: document.getElementById("chartTrimestre").getContext("2d"),
+        etiquetas,
+        valores,
+        tipo: "bar",
+        titulo: "Colonoscopias por Trimestre",
+        barraAngosta: true, // Barras más angostas
+      });
+    }
 
-// Gráfico trimestral (barras verticales)
-function procesarDatosTrimestre(data) {
-  const trimestres = {};
-  data.forEach(item => {
-    const fecha = new Date(item.fecha);
-    const trimestre = obtenerTrimestre(fecha);
-    trimestres[trimestre] = (trimestres[trimestre] || 0) + 1;
-  });
+    // Función general para graficar
+    function graficar({ ctx, etiquetas, valores, tipo, titulo, orientacion, tipoPunto, efectoPunto, barraAngosta, mostrarNumeroDentro }) {
+      const colores = etiquetas.map(() => `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.6)`);
 
-  const etiquetas = Object.keys(trimestres).sort();
-  const valores = etiquetas.map(trimestre => trimestres[trimestre]);
+      const datasets = [{
+        label: titulo,
+        data: valores,
+        backgroundColor: colores,
+        borderColor: colores.map(color => color.replace("0.6", "1")),
+        borderWidth: 1,
+        pointRadius: tipoPunto === "circle" ? 5 : 0,
+        hoverRadius: tipoPunto === "circle" ? 10 : 0,
+      }];
 
-  graficar({
-    ctx: document.getElementById("chartTrimestre").getContext("2d"),
-    etiquetas,
-    valores,
-    tipo: "bar",
-    titulo: "Colonoscopias por Trimestre",
-  });
-}
+      const options = {
+        responsive: true,
+        maintainAspectRatio: false, // Permitir ajuste de tamaño de los gráficos
+        indexAxis: orientacion === "horizontal" ? "y" : "x",
+        scales: {
+          x: {
+            beginAtZero: true,
+            barThickness: barraAngosta ? 6 : 12, // Barras más angostas
+          },
+          y: {
+            beginAtZero: true,
+          },
+        },
+        plugins: {
+          datalabels: {
+            display: mostrarNumeroDentro, // Mostrar número dentro de la barra
+            align: "end",
+            anchor: "end",
+            font: {
+              weight: "bold",
+            },
+            color: "#fff",
+          },
+        },
+      };
 
-// Función general para graficar
-function graficar({ ctx, etiquetas, valores, tipo, titulo, orientacion }) {
-  const colores = etiquetas.map(() => `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.6)`);
+      new Chart(ctx, {
+        type: tipo,
+        data: {
+          labels: etiquetas,
+          datasets,
+        },
+        options,
+      });
+    }
 
-  const datasets = [{
-    label: titulo,
-    data: valores,
-    backgroundColor: colores,
-    borderColor: colores.map(color => color.replace("0.6", "1")),
-    borderWidth: 1,
-  }];
+    function obtenerSemanaDelAno(fecha) {
+      const inicioAno = new Date(fecha.getFullYear(), 0, 1);
+      const dias = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
+      return `S${Math.ceil((dias + inicioAno.getDay() + 1) / 7)}`;
+    }
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: true,
-    indexAxis: orientacion === "horizontal" ? "y" : "x",
-    scales: {
-      x: {
-        beginAtZero: true,
-      },
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
+    function obtenerTrimestre(fecha) {
+      const year = fecha.getFullYear();
+      const month = fecha.getMonth(); // Meses: 0-11
+      const trimestre = Math.floor(month / 3) + 1;
+      return `Q${trimestre} ${year}`;
+    }
 
-  new Chart(ctx, {
-    type: tipo,
-    data: {
-      labels: etiquetas,
-      datasets,
-    },
-    options,
-  });
-}
+    obtenerDatos();
 
-function obtenerSemanaDelAno(fecha) {
-  const inicioAno = new Date(fecha.getFullYear(), 0, 1);
-  const dias = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
-  return `S${Math.ceil((dias + inicioAno.getDay() + 1) / 7)}`;
-}
-
-function obtenerTrimestre(fecha) {
-  const year = fecha.getFullYear();
-  const month = fecha.getMonth(); // Meses: 0-11
-  const trimestre = Math.floor(month / 3) + 1;
-  return `Q${trimestre} ${year}`;
-}
-
-obtenerDatos();
+    // Función para ajustar gráficos al tamaño de la ventana
+    window.addEventListener("resize", function() {
+      const charts = Chart.instances;
+      charts.forEach(chart => chart.resize());
+    });
