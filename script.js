@@ -10,7 +10,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 async function obtenerDatos() {
   try {
     const { data, error } = await supabase
-      .from("Reportes")
+      .from("Reportes") // Nombre de la tabla de Supabase
       .select("fecha");
 
     if (error) {
@@ -18,58 +18,33 @@ async function obtenerDatos() {
       return;
     }
 
+    // Procesar los datos
     procesarDatos(data);
   } catch (e) {
     console.error("Error general:", e);
   }
 }
 
-// Procesar datos y generar gráficos
+// Procesar los datos y graficar
 function procesarDatos(data) {
   const fechas = data.map((item) => new Date(item.fecha));
   const porSemana = agruparPorSemana(fechas);
-  const porMes = agruparPorMes(fechas);
-  const porTrimestre = agruparPorTrimestre(fechas);
-
-  graficar("chartSemana", porSemana, "Colonoscopias por Semana");
-  graficar("chartMes", porMes, "Colonoscopias por Mes");
-  graficar("chartTrimestre", porTrimestre, "Colonoscopias por Trimestre");
+  graficar(porSemana);
 }
 
-// Función para obtener la semana del año
-function obtenerSemanaDelAno(fecha) {
-  const inicioAno = new Date(fecha.getFullYear(), 0, 1);
-  const diasTranscurridos = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
-  return `S${Math.ceil((diasTranscurridos + inicioAno.getDay() + 1) / 7)}-${fecha.getFullYear()}`;
-}
-
+// Agrupar los datos por semana
 function agruparPorSemana(fechas) {
   const semanas = {};
+
   fechas.forEach((fecha) => {
     const semana = obtenerSemanaDelAno(fecha);
     semanas[semana] = (semanas[semana] || 0) + 1;
   });
+
   return formatearDatos(semanas);
 }
 
-function agruparPorMes(fechas) {
-  const meses = {};
-  fechas.forEach((fecha) => {
-    const mes = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
-    meses[mes] = (meses[mes] || 0) + 1;
-  });
-  return formatearDatos(meses);
-}
-
-function agruparPorTrimestre(fechas) {
-  const trimestres = {};
-  fechas.forEach((fecha) => {
-    const trimestre = `T${Math.ceil((fecha.getMonth() + 1) / 3)}-${fecha.getFullYear()}`;
-    trimestres[trimestre] = (trimestres[trimestre] || 0) + 1;
-  });
-  return formatearDatos(trimestres);
-}
-
+// Formatear los datos para el gráfico
 function formatearDatos(datos) {
   return {
     labels: Object.keys(datos),
@@ -77,17 +52,15 @@ function formatearDatos(datos) {
   };
 }
 
-// Datos de ejemplo (semanas con formato 'Enero S01', 'Enero S02', etc.)
-const datosSemana = {
-  labels: [
-    "Enero S01", "Enero S02", "Enero S03", "Enero S04", 
-    "Febrero S01", "Febrero S02", "Febrero S03", "Febrero S04"
-  ],
-  valores: [10, 15, 12, 9, 20, 25, 30, 35]
-};
+// Función para obtener la semana del año
+function obtenerSemanaDelAno(fecha) {
+  const inicioAno = new Date(fecha.getFullYear(), 0, 1);
+  const diasTranscurridos = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
+  return `Enero S${Math.ceil((diasTranscurridos + inicioAno.getDay() + 1) / 7)}`;
+}
 
 // Graficar con Chart.js
-function graficar() {
+function graficar(datosSemana) {
   const ctx = document.getElementById("chartSemana").getContext("2d");
 
   const minValor = Math.min(...datosSemana.valores);  // Mínimo valor
@@ -170,5 +143,5 @@ function graficar() {
   });
 }
 
-// Llamamos a la función para graficar
-graficar();
+// Llamar a la función principal
+obtenerDatos();
