@@ -17,8 +17,7 @@ h1, h2 {
 
 /* Centrar los gráficos y agregar espacio */
 canvas {
-  width: 100%;  /* El gráfico puede adaptarse al 100% del contenedor */
-  max-width: 800px;  /* Tamaño máximo de 800px */
+  width: 800px;  /* Ancho fijo de 800px */
   height: 500px;  /* Altura fija, ajustable según el diseño */
   margin: 20px auto;
   display: block;
