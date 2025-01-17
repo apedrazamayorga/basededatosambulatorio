@@ -97,8 +97,8 @@ async function obtenerDatos() {
         backgroundColor: colores,
         borderColor: colores.map(color => color.replace("0.6", "1")),
         borderWidth: 1,
-        pointRadius: tipoPunto === "circle" ? 20 : 0,
-        hoverRadius: tipoPunto === "circle" ? 40 : 0,
+        pointRadius: tipoPunto === "circle" ? 10 : 0,
+        hoverRadius: tipoPunto === "circle" ? 20 : 0,
       }];
 
       const options = {
