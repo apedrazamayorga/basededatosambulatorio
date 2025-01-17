@@ -27,18 +27,22 @@ function procesarDatosColonoscopia(data) {
     }
   });
 
-  const datosOrdenados = formatearDatosCronologicamente(semanas);
-  graficar(datosOrdenados, "Colonoscopias por Semana");
-}
-
 function formatearDatosCronologicamente(datos) {
-  const semanasOrdenadas = Object.keys(datos).sort();
+  // Ordenar las semanas de manera numérica
+  const semanasOrdenadas = Object.keys(datos)
+    .sort((a, b) => {
+      // Extraer el número de semana de las cadenas "S1", "S2", ..., "S20"
+      const semanaA = parseInt(a.replace('S', ''));
+      const semanaB = parseInt(b.replace('S', ''));
+      return semanaA - semanaB;  // Ordenar de menor a mayor
+    });
+
   return {
     labels: semanasOrdenadas,
     valores: semanasOrdenadas.map(semana => datos[semana]),
   };
 }
-
+  
 function obtenerSemanaDelAno(fecha) {
   const inicioAno = new Date(fecha.getFullYear(), 0, 1);
   const dias = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
