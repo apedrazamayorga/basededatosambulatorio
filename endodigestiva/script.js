@@ -129,6 +129,45 @@ function crearGraficoSemanal(datos) {
   });
 }
 
+function crearGraficoMensual(datos) {
+  const ctx = document.getElementById("chartMensual").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",  // Usamos "bar" para barras
+    data: {
+      labels: datos.labels,
+      datasets: [
+        {
+          label: "Colonoscopias",
+          data: datos.colonoscopias,
+          backgroundColor: "rgba(75, 192, 192, 1)",
+          barThickness: 12,  // Ajustamos el grosor de las barras
+        },
+        {
+          label: "Gastroduodenoscopias",
+          data: datos.gastroduodenoscopias,
+          backgroundColor: "rgba(255, 99, 132, 1)",
+          barThickness: 12,  // Ajustamos el grosor de las barras
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          stacked: true,
+          beginAtZero: true,
+          barPercentage: 0.5,  // Reduce el ancho de las barras
+          categoryPercentage: 0.5,  // Reduce el espacio entre las barras
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
 
 function crearGraficoTrimestral(datos) {
   const ctx = document.getElementById("chartTrimestre").getContext("2d");
