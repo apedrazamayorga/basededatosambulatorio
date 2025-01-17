@@ -24,37 +24,36 @@ async function obtenerDatos() {
 }
 
 function procesarDatosSemanales(data) {
-  const semanasAnuales = Array.from({ length: 52 }, (_, i) => `Semana ${i + 1}`);
-  const resumenSemanal = semanasAnuales.map(() => ({ colonoscopias: 0, gastroduodenoscopias: 0 }));
+  const resumenSemanal = Array(52).fill(0).map(() => ({ colonoscopias: 0, gastroduodenoscopias: 0 }));
 
   data.forEach((item) => {
     const fecha = new Date(item.fecha);
-    const semana = Math.floor(
-      (fecha.getTime() - new Date(fecha.getFullYear(), 0, 1).getTime()) /
-      (7 * 24 * 60 * 60 * 1000)
-    );
+    const semana = Math.floor((fecha.getTime() - new Date(fecha.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
 
-    if (semana >= 0 && semana < 52) {
-      if (item.tipo_procedimiento === "colonoscopia") {
-        resumenSemanal[semana].colonoscopias++;
-      } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
-        resumenSemanal[semana].gastroduodenoscopias++;
-      }
+    if (item.tipo_procedimiento === "colonoscopia") {
+      resumenSemanal[semana].colonoscopias++;
+    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+      resumenSemanal[semana].gastroduodenoscopias++;
     }
   });
 
+  const labels = resumenSemanal.map((_, i) => `Semana ${i + 1}`);
   const colonoscopias = resumenSemanal.map((semana) => semana.colonoscopias);
   const gastroduodenoscopias = resumenSemanal.map((semana) => semana.gastroduodenoscopias);
 
-  return { labels: semanasAnuales, colonoscopias, gastroduodenoscopias };
+  return { labels, colonoscopias, gastroduodenoscopias };
 }
 
 function procesarDatosMensuales(data) {
-  const resumenMensual = Array.from({ length: 12 }, (_, i) => ({ colonoscopias: 0, gastroduodenoscopias: 0 }));
+  const resumenMensual = {};
 
   data.forEach((item) => {
     const fecha = new Date(item.fecha);
-    const mes = fecha.getMonth();
+    const mes = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
+
+    if (!resumenMensual[mes]) {
+      resumenMensual[mes] = { colonoscopias: 0, gastroduodenoscopias: 0 };
+    }
 
     if (item.tipo_procedimiento === "colonoscopia") {
       resumenMensual[mes].colonoscopias++;
@@ -63,9 +62,9 @@ function procesarDatosMensuales(data) {
     }
   });
 
-  const labels = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-  const colonoscopias = resumenMensual.map((mes) => mes.colonoscopias);
-  const gastroduodenoscopias = resumenMensual.map((mes) => mes.gastroduodenoscopias);
+  const labels = Object.keys(resumenMensual);
+  const colonoscopias = labels.map((mes) => resumenMensual[mes].colonoscopias);
+  const gastroduodenoscopias = labels.map((mes) => resumenMensual[mes].gastroduodenoscopias);
 
   return { labels, colonoscopias, gastroduodenoscopias };
 }
@@ -151,7 +150,6 @@ function crearGraficoMensual(datos) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
       scales: {
         x: {
           stacked: true,
@@ -173,5 +171,31 @@ function crearGraficoTrimestral(datos) {
       labels: datos.labels,
       datasets: [
         {
-          label: "Colonoscopias
+          label: "Colonoscopias",
+          data: datos.colonoscopias,
+          backgroundColor: "rgba(75, 192, 192, 1)",
+        },
+        {
+          label: "Gastroduodenoscopias",
+          data: datos.gastroduodenoscopias,
+          backgroundColor: "rgba(255, 99, 132, 1)",
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
+obtenerDatos();
 
