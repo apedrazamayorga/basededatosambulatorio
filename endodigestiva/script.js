@@ -17,49 +17,44 @@ async function obtenerDatosEndoscopia() {
   return data;
 }
 
-function procesarDatos(data) {
-  const datosSemanales = generarDatosPorPeriodo(data, "semana");
-  const datosMensuales = generarDatosPorPeriodo(data, "mes");
-  const datosTrimestrales = generarDatosPorPeriodo(data, "trimestre");
-
-  return { datosSemanales, datosMensuales, datosTrimestrales };
+function generarSemanasDelAño() {
+  const semanas = [];
+  for (let i = 1; i <= 52; i++) {
+    semanas.push(`Semana ${i}`);
+  }
+  return semanas;
 }
 
-function generarDatosPorPeriodo(data, periodo) {
-  const map = new Map();
+function procesarDatosSemanales(data) {
+  const semanasDelAño = generarSemanasDelAño();
+  const conteoSemanal = semanasDelAño.map(() => ({
+    colonoscopias: 0,
+    gastroduodenoscopias: 0,
+  }));
 
   data.forEach(({ fecha, tipo_procedimiento }) => {
     const date = new Date(fecha);
-    let key;
+    const semana = Math.ceil(
+      (date.getDate() + new Date(date.getFullYear(), 0, 1).getDay()) / 7
+    );
 
-    if (periodo === "semana") {
-      const semana = `Semana ${Math.ceil((date.getDate() + new Date(date.getFullYear(), date.getMonth(), 0).getDay()) / 7)}`;
-      key = semana;
-    } else if (periodo === "mes") {
-      key = new Date(date).toLocaleString("es-ES", { month: "long" });
-    } else if (periodo === "trimestre") {
-      key = `Q${Math.ceil((date.getMonth() + 1) / 3)}`;
-    }
-
-    if (!map.has(key)) {
-      map.set(key, { colonoscopias: 0, gastroduodenoscopias: 0 });
-    }
-
-    if (tipo_procedimiento === "colonoscopia") {
-      map.get(key).colonoscopias += 1;
-    } else if (tipo_procedimiento === "gastroduodenoscopia") {
-      map.get(key).gastroduodenoscopias += 1;
+    if (semana > 0 && semana <= 52) {
+      if (tipo_procedimiento === "colonoscopia") {
+        conteoSemanal[semana - 1].colonoscopias += 1;
+      } else if (tipo_procedimiento === "gastroduodenoscopia") {
+        conteoSemanal[semana - 1].gastroduodenoscopias += 1;
+      }
     }
   });
 
-  const labels = [...map.keys()].sort();
-  const colonoscopias = labels.map((label) => map.get(label).colonoscopias);
-  const gastroduodenoscopias = labels.map((label) => map.get(label).gastroduodenoscopias);
-
-  return { labels, colonoscopias, gastroduodenoscopias };
+  return {
+    labels: semanasDelAño,
+    colonoscopias: conteoSemanal.map((semana) => semana.colonoscopias),
+    gastroduodenoscopias: conteoSemanal.map((semana) => semana.gastroduodenoscopias),
+  };
 }
 
-function renderizarGraficos({ datosSemanales, datosMensuales, datosTrimestrales }) {
+function renderizarGraficoSemanal(datosSemanales) {
   const ctxSemana = document.getElementById("chartSemana").getContext("2d");
   new Chart(ctxSemana, {
     type: "line",
@@ -84,52 +79,12 @@ function renderizarGraficos({ datosSemanales, datosMensuales, datosTrimestrales 
     },
     options: {
       responsive: true,
-    },
-  });
-
-  const ctxMensual = document.getElementById("chartMensual").getContext("2d");
-  new Chart(ctxMensual, {
-    type: "bar",
-    data: {
-      labels: datosMensuales.labels,
-      datasets: [
-        {
-          label: "Colonoscopias",
-          data: datosMensuales.colonoscopias,
-          backgroundColor: "rgba(75, 192, 192, 1)",
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
         },
-        {
-          label: "Gastroduodenoscopias",
-          data: datosMensuales.gastroduodenoscopias,
-          backgroundColor: "rgba(255, 99, 132, 1)",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-    },
-  });
-
-  const ctxTrimestre = document.getElementById("chartTrimestre").getContext("2d");
-  new Chart(ctxTrimestre, {
-    type: "bar",
-    data: {
-      labels: datosTrimestrales.labels,
-      datasets: [
-        {
-          label: "Colonoscopias",
-          data: datosTrimestrales.colonoscopias,
-          backgroundColor: "rgba(75, 192, 192, 1)",
-        },
-        {
-          label: "Gastroduodenoscopias",
-          data: datosTrimestrales.gastroduodenoscopias,
-          backgroundColor: "rgba(255, 99, 132, 1)",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
+      },
     },
   });
 }
@@ -137,8 +92,8 @@ function renderizarGraficos({ datosSemanales, datosMensuales, datosTrimestrales 
 async function main() {
   const data = await obtenerDatosEndoscopia();
   if (data) {
-    const procesados = procesarDatos(data);
-    renderizarGraficos(procesados);
+    const datosSemanales = procesarDatosSemanales(data);
+    renderizarGraficoSemanal(datosSemanales);
   }
 }
 
