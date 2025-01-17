@@ -103,7 +103,7 @@ async function obtenerDatos() {
 
       const options = {
         responsive: true,
-        maintainAspectRatio: false, // Permitir ajuste de tamaño de los gráficos
+        maintainAspectRatio: true, // Permitir ajuste de tamaño de los gráficos
         indexAxis: orientacion === "horizontal" ? "y" : "x",
         scales: {
           x: {
