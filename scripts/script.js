@@ -96,13 +96,15 @@ function graficar(datosSemana) {
           align: "start",
         },
       },
-      scales: {
-        y: {
-          beginAtZero: true, // Inicia en 0
-          min: minValor,     // Mínimo en 0
-          max: maxValor,     // Máximo de los datos
-          ticks: {
-            color: '#000',
+      options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true, // Inicia en 0
+              min: minValor,     // Mínimo en 0
+              max: maxValor,     // Máximo de los datos
+              ticks: {
+                color: '#000',
           },
         },
         x: {
