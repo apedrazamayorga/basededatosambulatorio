@@ -21,7 +21,8 @@ canvas {
   display: block;
   width: 100%;
   max-width: 1200px; /* Ancho máximo para escritorio */
-  height: 400px; /* Altura fija */
+  height: 100%;
+  máx-height: 400px; /* Altura fija */
 }
 /* Contenedor de gráficos */
 div {
