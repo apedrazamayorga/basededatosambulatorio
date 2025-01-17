@@ -1,7 +1,7 @@
 /* Estilo para el cuerpo de la página */
 body {
-  font-family: 'Montserrat', sans-serif;  /* Fuente moderna */
-  background-color: #ffffff;  /* Fondo blanco */
+  font-family: 'Montserrat', sans-serif;  /* Fuente más moderna */
+  background-color: #f8f9fa;
   color: #343a40;
   margin: 0;
   padding: 20px;
@@ -10,15 +10,13 @@ body {
 
 /* Estilo para los encabezados */
 h1, h2 {
-  color: #000000;  /* Títulos en negro */
+  color: #007bff;
   margin-bottom: 20px;
-  text-align: left;  /* Justificado a la izquierda */
 }
 
 /* Centrar los gráficos y agregar espacio */
 canvas {
-  width: 800px;  /* Ancho fijo de 800px */
-  height: 500px;  /* Altura fija, ajustable según el diseño */
+  max-width: 800px;
   margin: 20px auto;
   display: block;
 }
@@ -30,7 +28,7 @@ div {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
   border-radius: 8px;
-  max-width: 100%;  /* Contenedor se ajusta al tamaño de la pantalla */
+  max-width: 900px;
 }
 
 /* Estilo para las etiquetas */
