@@ -77,6 +77,7 @@ function formatearDatos(datos) {
   };
 }
 
+// Graficar con Chart.js (ajuste sin la línea de tendencia)
 function graficar(canvasId, datos, titulo) {
   const ctx = document.getElementById(canvasId).getContext("2d");
   new Chart(ctx, {
@@ -116,6 +117,7 @@ function graficar(canvasId, datos, titulo) {
     },
   });
 }
+
 
 // Calcular la línea de tendencia (promedio móvil)
 function calcularTendencia(valores) {
