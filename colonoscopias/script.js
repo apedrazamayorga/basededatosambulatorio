@@ -58,22 +58,38 @@ function graficar(datos, titulo) {
   const suggestedMin = Math.floor(minValor / 10) * 10; // Redondear hacia abajo a la decena previa
   const suggestedMax = Math.ceil(maxValor / 10) * 10;  // Redondear hacia arriba a la decena posterior
 
+  // Calcular el total de procedimientos
+  const totalProcedimientos = datos.valores.reduce((a, b) => a + b, 0);
+
   new Chart(ctx, {
     type: "line",
     data: {
       labels: datos.labels,
       datasets: [{
-        label: titulo,
+        label: `${titulo} (Total: ${totalProcedimientos})`, // Mostrar el total en la leyenda
         data: datos.valores,
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.3,
+        pointRadius: datos.valores.map(valor => valor / 2), // Tamaño del círculo proporcional a la cantidad
+        pointHoverRadius: datos.valores.map(valor => valor / 1.5), // Aumenta al pasar el mouse
+        pointBackgroundColor: "rgba(75, 192, 192, 1)", // Color del círculo
       }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
       aspectRatio: 2,
+      plugins: {
+        legend: {
+          display: true, // Mostrar la leyenda con el total
+          labels: {
+            font: {
+              size: 14,
+            },
+          },
+        },
+      },
       scales: {
         y: {
           beginAtZero: false, // Permite ajustar los límites de la escala manualmente
