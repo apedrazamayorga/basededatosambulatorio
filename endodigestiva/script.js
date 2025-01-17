@@ -132,7 +132,7 @@ function crearGraficoSemanal(datos) {
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
   new Chart(ctx, {
-    type: "bar",
+    type: "bar",  // Usamos "bar" para barras horizontales
     data: {
       labels: datos.labels,
       datasets: [
@@ -140,11 +140,13 @@ function crearGraficoMensual(datos) {
           label: "Colonoscopias",
           data: datos.colonoscopias,
           backgroundColor: "rgba(75, 192, 192, 1)",
+          barThickness: 12,  // Ajustamos el grosor de las barras
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
           backgroundColor: "rgba(255, 99, 132, 1)",
+          barThickness: 12,  // Ajustamos el grosor de las barras
         },
       ],
     },
@@ -153,6 +155,7 @@ function crearGraficoMensual(datos) {
       scales: {
         x: {
           stacked: true,
+          beginAtZero: true,
         },
         y: {
           stacked: true,
@@ -174,11 +177,13 @@ function crearGraficoTrimestral(datos) {
           label: "Colonoscopias",
           data: datos.colonoscopias,
           backgroundColor: "rgba(75, 192, 192, 1)",
+          barThickness: 12,  // Ajustamos el grosor de las barras
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
           backgroundColor: "rgba(255, 99, 132, 1)",
+          barThickness: 12,  // Ajustamos el grosor de las barras
         },
       ],
     },
@@ -187,6 +192,7 @@ function crearGraficoTrimestral(datos) {
       scales: {
         x: {
           stacked: true,
+          beginAtZero: true,
         },
         y: {
           stacked: true,
@@ -196,6 +202,7 @@ function crearGraficoTrimestral(datos) {
     },
   });
 }
+
 
 obtenerDatos();
 
