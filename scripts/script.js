@@ -96,8 +96,7 @@ function graficar(datosSemana) {
           align: "start",
         },
       },
-      options: {
-          responsive: true,
+      
           scales: {
             y: {
               beginAtZero: true, // Inicia en 0
