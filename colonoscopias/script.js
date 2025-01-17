@@ -52,6 +52,12 @@ function obtenerSemanaDelAno(fecha) {
 function graficar(datos, titulo) {
   const ctx = document.getElementById("chartSemana").getContext("2d");
 
+  // Calcular valores mínimos y máximos ajustados a las decenas
+  const minValor = Math.min(...datos.valores);
+  const maxValor = Math.max(...datos.valores);
+  const suggestedMin = Math.floor(minValor / 10) * 10; // Redondear hacia abajo a la decena previa
+  const suggestedMax = Math.ceil(maxValor / 10) * 10;  // Redondear hacia arriba a la decena posterior
+
   new Chart(ctx, {
     type: "line",
     data: {
@@ -70,7 +76,12 @@ function graficar(datos, titulo) {
       aspectRatio: 2,
       scales: {
         y: {
-          beginAtZero: true,
+          beginAtZero: false, // Permite ajustar los límites de la escala manualmente
+          suggestedMin: suggestedMin, // Usar la decena previa
+          suggestedMax: suggestedMax, // Usar la decena posterior
+          ticks: {
+            stepSize: 10, // Opcional: Ajusta los pasos entre números si deseas más control
+          },
         },
       },
     },
