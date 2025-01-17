@@ -17,24 +17,77 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       procesarDatosTrimestrales(data);
     }
 
-  // Datos de ejemplo para colonoscopias y gastroduodenoscopias
-const datosSemanales = {
-  labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-  colonoscopias: [10, 15, 8, 12],
-  gastroduodenoscopias: [5, 8, 6, 10],
+// Generar todas las semanas del año
+function generarSemanasAnuales() {
+  const semanas = [];
+  for (let i = 1; i <= 52; i++) {
+    semanas.push(`Semana ${i}`);
+  }
+  return semanas;
+}
+
+// Asegurar que todas las semanas estén representadas en los datos
+function completarSemanas(data) {
+  const semanasTotales = generarSemanasAnuales();
+  const datosCompletos = semanasTotales.map((semana) => {
+    const index = data.labels.indexOf(semana);
+    return index !== -1 ? data.values[index] : 0;
+  });
+  return { labels: semanasTotales, values: datosCompletos };
+}
+
+// Datos de ejemplo
+const datosColonoscopias = {
+  labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 5'],
+  values: [10, 15, 8, 20],
 };
 
-const datosMensuales = {
-  labels: ['Enero', 'Febrero', 'Marzo'],
-  colonoscopias: [40, 60, 55],
-  gastroduodenoscopias: [30, 45, 50],
+const datosGastroduodenoscopias = {
+  labels: ['Semana 1', 'Semana 3', 'Semana 4', 'Semana 6'],
+  values: [5, 6, 7, 9],
 };
 
-const datosTrimestrales = {
-  labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-  colonoscopias: [150, 200, 180, 220],
-  gastroduodenoscopias: [120, 160, 140, 190],
-};
+// Completar datos
+const datosSemanalesColonoscopias = completarSemanas(datosColonoscopias);
+const datosSemanalesGastroduodenoscopias = completarSemanas(datosGastroduodenoscopias);
+
+// Gráfico semanal
+const ctxSemana = document.getElementById('chartSemana').getContext('2d');
+new Chart(ctxSemana, {
+  type: 'line',
+  data: {
+    labels: datosSemanalesColonoscopias.labels,
+    datasets: [
+      {
+        label: 'Colonoscopias',
+        data: datosSemanalesColonoscopias.values,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.3,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+      },
+      {
+        label: 'Gastroduodenoscopias',
+        data: datosSemanalesGastroduodenoscopias.values,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        tension: 0.3,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  },
+});
 
 // Gráfico semanal
 const ctxSemana = document.getElementById('chartSemana').getContext('2d');
