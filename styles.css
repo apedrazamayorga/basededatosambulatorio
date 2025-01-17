@@ -1,7 +1,7 @@
 /* Estilo para el cuerpo de la página */
 body {
   font-family: 'Montserrat', sans-serif;  /* Fuente más moderna */
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   color: #343a40;
   margin: 0;
   padding: 20px;
@@ -16,7 +16,7 @@ h1, h2 {
 
 /* Centrar los gráficos y agregar espacio */
 canvas {
-  max-width: 800px;
+  width: 800px;
   margin: 20px auto;
   display: block;
 }
