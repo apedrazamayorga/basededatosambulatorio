@@ -66,15 +66,20 @@ function graficar(datos, titulo) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: true, // Asegúrate de que el gráfico mantenga la relación de aspecto
+      aspectRatio: 2,  // Esto bloquea la relación de aspecto (2:1, ajustable según necesidad)
       scales: {
         y: {
           beginAtZero: true,
+          ticks: {
+            // Establece los valores máximos y mínimos de la escala Y según los datos
+            max: Math.max(...datos.valores) * 1.2, // Un 20% más alto que el valor máximo
+            min: 0,
+          },
         },
       },
     },
   });
 }
-
 obtenerDatosColonoscopia();
 
