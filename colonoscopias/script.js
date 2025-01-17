@@ -6,7 +6,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function obtenerDatos() {
-  const { data, error } = await supabase.from("Reportes").select("fecha, colonoscopias");
+  const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
 
   if (error) {
     console.error("Error al obtener datos:", error);
@@ -21,7 +21,7 @@ function procesarDatos(data) {
   data.forEach(item => {
     const fecha = new Date(item.fecha);
     const semana = obtenerSemanaDelAno(fecha);
-    semanas[semana] = (semanas[semana] || 0) + item.colonoscopias;
+    semanas[semana] = (semanas[semana] || 0) + item.tipo_procedimiento;
   });
 
   const datosOrdenados = formatearDatosCronologicamente(semanas);
