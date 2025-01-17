@@ -4,155 +4,175 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-
-// Función principal para obtener y procesar los datos
-async function obtenerDatos() {
-  const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
-
-  if (error) {
-    console.error("Error al obtener datos:", error);
-    return;
-  }
-
-  const datosSemanales = procesarDatosSemanales(data);
-  graficarSemanales(datosSemanales);
-
-  const datosMensuales = procesarDatosMensuales(data);
-  graficarMensuales(datosMensuales);
-
-  const datosTrimestrales = procesarDatosTrimestrales(data);
-  graficarTrimestrales(datosTrimestrales);
+// Función para calcular el día del año
+function getDayOfYear(date) {
+    const startOfYear = new Date(date.getFullYear(), 0, 0);
+    const diff = date - startOfYear + ((startOfYear.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000);
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
 // Procesar datos semanales
 function procesarDatosSemanales(data) {
-  const semanas = Array.from({ length: 52 }, (_, i) => `Semana ${i + 1}`);
-  const colonoscopias = Array(52).fill(0);
-  const gastroduodenoscopias = Array(52).fill(0);
+    const semanas = {};
 
-  data.forEach(({ fecha, tipo_procedimiento }) => {
-    const date = new Date(fecha);
-    const semana = Math.floor((date.getDayOfYear() - 1) / 7);
-    if (tipo_procedimiento === "colonoscopia") colonoscopias[semana]++;
-    else if (tipo_procedimiento === "gastroduodenoscopia") gastroduodenoscopias[semana]++;
-  });
+    data.forEach((item) => {
+        const date = new Date(item.fecha);
+        const dayOfYear = getDayOfYear(date);
+        const week = Math.ceil(dayOfYear / 7);
+        const key = `Semana ${week}`;
 
-  return { semanas, colonoscopias, gastroduodenoscopias };
+        if (!semanas[key]) {
+            semanas[key] = { colonoscopias: 0, gastroduodenoscopias: 0 };
+        }
+
+        if (item.tipo_procedimiento === "colonoscopia") {
+            semanas[key].colonoscopias++;
+        } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+            semanas[key].gastroduodenoscopias++;
+        }
+    });
+
+    return semanas;
 }
 
 // Procesar datos mensuales
 function procesarDatosMensuales(data) {
-  const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-  const colonoscopias = Array(12).fill(0);
-  const gastroduodenoscopias = Array(12).fill(0);
+    const meses = Array.from({ length: 12 }, () => ({ colonoscopias: 0, gastroduodenoscopias: 0 }));
 
-  data.forEach(({ fecha, tipo_procedimiento }) => {
-    const mes = new Date(fecha).getMonth();
-    if (tipo_procedimiento === "colonoscopia") colonoscopias[mes]++;
-    else if (tipo_procedimiento === "gastroduodenoscopia") gastroduodenoscopias[mes]++;
-  });
+    data.forEach((item) => {
+        const date = new Date(item.fecha);
+        const month = date.getMonth(); // Mes (0-11)
 
-  return { meses, colonoscopias, gastroduodenoscopias };
+        if (item.tipo_procedimiento === "colonoscopia") {
+            meses[month].colonoscopias++;
+        } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+            meses[month].gastroduodenoscopias++;
+        }
+    });
+
+    return meses;
 }
 
 // Procesar datos trimestrales
 function procesarDatosTrimestrales(data) {
-  const trimestres = ["Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4"];
-  const colonoscopias = Array(4).fill(0);
-  const gastroduodenoscopias = Array(4).fill(0);
+    const trimestres = Array.from({ length: 4 }, () => ({ colonoscopias: 0, gastroduodenoscopias: 0 }));
 
-  data.forEach(({ fecha, tipo_procedimiento }) => {
-    const trimestre = Math.floor(new Date(fecha).getMonth() / 3);
-    if (tipo_procedimiento === "colonoscopia") colonoscopias[trimestre]++;
-    else if (tipo_procedimiento === "gastroduodenoscopia") gastroduodenoscopias[trimestre]++;
-  });
+    data.forEach((item) => {
+        const date = new Date(item.fecha);
+        const quarter = Math.floor(date.getMonth() / 3); // Trimestre (0-3)
 
-  return { trimestres, colonoscopias, gastroduodenoscopias };
+        if (item.tipo_procedimiento === "colonoscopia") {
+            trimestres[quarter].colonoscopias++;
+        } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+            trimestres[quarter].gastroduodenoscopias++;
+        }
+    });
+
+    return trimestres;
 }
 
-// Graficar datos semanales
-function graficarSemanales({ semanas, colonoscopias, gastroduodenoscopias }) {
-  const ctx = document.getElementById("chartSemana").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: semanas,
-      datasets: [
-        {
-          label: "Colonoscopias",
-          data: colonoscopias,
-          borderColor: "rgba(75, 192, 192, 1)",
-          backgroundColor: "rgba(75, 192, 192, 0.2)",
+// Renderizar gráficos
+function renderizarGraficos(semanales, mensuales, trimestrales) {
+    const ctxSemana = document.getElementById("chartSemana").getContext("2d");
+    const ctxMensual = document.getElementById("chartMensual").getContext("2d");
+    const ctxTrimestre = document.getElementById("chartTrimestre").getContext("2d");
+
+    // Gráfico semanal
+    new Chart(ctxSemana, {
+        type: "line",
+        data: {
+            labels: Object.keys(semanales),
+            datasets: [
+                {
+                    label: "Colonoscopias",
+                    data: Object.values(semanales).map((item) => item.colonoscopias),
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                },
+                {
+                    label: "Gastroduodenoscopias",
+                    data: Object.values(semanales).map((item) => item.gastroduodenoscopias),
+                    borderColor: "rgba(255, 99, 132, 1)",
+                    backgroundColor: "rgba(255, 99, 132, 0.2)",
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                },
+            ],
         },
-        {
-          label: "Gastroduodenoscopias",
-          data: gastroduodenoscopias,
-          borderColor: "rgba(255, 99, 132, 1)",
-          backgroundColor: "rgba(255, 99, 132, 0.2)",
+        options: {
+            responsive: true,
         },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-    },
-  });
+    });
+
+    // Gráfico mensual
+    new Chart(ctxMensual, {
+        type: "bar",
+        data: {
+            labels: [
+                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+            ],
+            datasets: [
+                {
+                    label: "Colonoscopias",
+                    data: mensuales.map((item) => item.colonoscopias),
+                    backgroundColor: "rgba(75, 192, 192, 1)",
+                },
+                {
+                    label: "Gastroduodenoscopias",
+                    data: mensuales.map((item) => item.gastroduodenoscopias),
+                    backgroundColor: "rgba(255, 99, 132, 1)",
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            indexAxis: "y", // Barras horizontales
+        },
+    });
+
+    // Gráfico trimestral
+    new Chart(ctxTrimestre, {
+        type: "bar",
+        data: {
+            labels: ["Q1", "Q2", "Q3", "Q4"],
+            datasets: [
+                {
+                    label: "Colonoscopias",
+                    data: trimestrales.map((item) => item.colonoscopias),
+                    backgroundColor: "rgba(75, 192, 192, 1)",
+                },
+                {
+                    label: "Gastroduodenoscopias",
+                    data: trimestrales.map((item) => item.gastroduodenoscopias),
+                    backgroundColor: "rgba(255, 99, 132, 1)",
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+        },
+    });
 }
 
-// Graficar datos mensuales
-function graficarMensuales({ meses, colonoscopias, gastroduodenoscopias }) {
-  const ctx = document.getElementById("chartMensual").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: meses,
-      datasets: [
-        {
-          label: "Colonoscopias",
-          data: colonoscopias,
-          backgroundColor: "rgba(75, 192, 192, 0.8)",
-        },
-        {
-          label: "Gastroduodenoscopias",
-          data: gastroduodenoscopias,
-          backgroundColor: "rgba(255, 99, 132, 0.8)",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      indexAxis: "y",
-      maintainAspectRatio: false,
-    },
-  });
+// Obtener datos
+async function obtenerDatos() {
+    const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
+
+    if (error) {
+        console.error("Error al obtener datos:", error);
+        return;
+    }
+
+    const semanales = procesarDatosSemanales(data);
+    const mensuales = procesarDatosMensuales(data);
+    const trimestrales = procesarDatosTrimestrales(data);
+
+    renderizarGraficos(semanales, mensuales, trimestrales);
 }
 
-// Graficar datos trimestrales
-function graficarTrimestrales({ trimestres, colonoscopias, gastroduodenoscopias }) {
-  const ctx = document.getElementById("chartTrimestral").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: trimestres,
-      datasets: [
-        {
-          label: "Colonoscopias",
-          data: colonoscopias,
-          backgroundColor: "rgba(75, 192, 192, 0.8)",
-        },
-        {
-          label: "Gastroduodenoscopias",
-          data: gastroduodenoscopias,
-          backgroundColor: "rgba(255, 99, 132, 0.8)",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-    },
-  });
-}
-
-// Iniciar la obtención de datos
 obtenerDatos();
