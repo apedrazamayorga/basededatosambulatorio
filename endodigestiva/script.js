@@ -4,6 +4,12 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 async function obtenerDatos() {
   const { data, error } = await supabase
     .from("Reportes")
@@ -21,31 +27,6 @@ async function obtenerDatos() {
   crearGraficoSemanal(datosSemanales);
   crearGraficoMensual(datosMensuales);
   crearGraficoTrimestral(datosTrimestrales);
-}
-
-function procesarDatosSemanales(data) {
-  const resumenSemanal = {};
-
-  data.forEach((item) => {
-    const fecha = new Date(item.fecha);
-    const semana = `Semana ${Math.ceil((fecha - new Date(fecha.getFullYear(), 0, 1)) / (7 * 24 * 60 * 60 * 1000))}`;
-
-    if (!resumenSemanal[semana]) {
-      resumenSemanal[semana] = { colonoscopias: 0, gastroduodenoscopias: 0 };
-    }
-
-    if (item.tipo_procedimiento === "colonoscopia") {
-      resumenSemanal[semana].colonoscopias++;
-    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
-      resumenSemanal[semana].gastroduodenoscopias++;
-    }
-  });
-
-  const labels = Object.keys(resumenSemanal);
-  const colonoscopias = labels.map((semana) => resumenSemanal[semana].colonoscopias);
-  const gastroduodenoscopias = labels.map((semana) => resumenSemanal[semana].gastroduodenoscopias);
-
-  return { labels, colonoscopias, gastroduodenoscopias };
 }
 
 function procesarDatosMensuales(data) {
@@ -73,60 +54,6 @@ function procesarDatosMensuales(data) {
   return { labels, colonoscopias, gastroduodenoscopias };
 }
 
-function procesarDatosTrimestrales(data) {
-  const resumenTrimestral = {};
-
-  data.forEach((item) => {
-    const fecha = new Date(item.fecha);
-    const trimestre = `Q${Math.ceil((fecha.getMonth() + 1) / 3)}-${fecha.getFullYear()}`;
-
-    if (!resumenTrimestral[trimestre]) {
-      resumenTrimestral[trimestre] = { colonoscopias: 0, gastroduodenoscopias: 0 };
-    }
-
-    if (item.tipo_procedimiento === "colonoscopia") {
-      resumenTrimestral[trimestre].colonoscopias++;
-    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
-      resumenTrimestral[trimestre].gastroduodenoscopias++;
-    }
-  });
-
-  const labels = Object.keys(resumenTrimestral);
-  const colonoscopias = labels.map((trimestre) => resumenTrimestral[trimestre].colonoscopias);
-  const gastroduodenoscopias = labels.map((trimestre) => resumenTrimestral[trimestre].gastroduodenoscopias);
-
-  return { labels, colonoscopias, gastroduodenoscopias };
-}
-
-function crearGraficoSemanal(datos) {
-  const ctx = document.getElementById("chartSemana").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: datos.labels,
-      datasets: [
-        {
-          label: "Colonoscopias",
-          data: datos.colonoscopias,
-          borderColor: "rgba(75, 192, 192, 1)",
-          backgroundColor: "rgba(75, 192, 192, 0.2)",
-          tension: 0.3,
-        },
-        {
-          label: "Gastroduodenoscopias",
-          data: datos.gastroduodenoscopias,
-          borderColor: "rgba(255, 99, 132, 1)",
-          backgroundColor: "rgba(255, 99, 132, 0.2)",
-          tension: 0.3,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-    },
-  });
-}
-
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
   new Chart(ctx, {
@@ -148,7 +75,15 @@ function crearGraficoMensual(datos) {
     },
     options: {
       responsive: true,
-      indexAxis: "y",
+      scales: {
+        x: {
+          stacked: true, // Habilitar apilamiento en el eje X
+        },
+        y: {
+          stacked: true, // Habilitar apilamiento en el eje Y
+          beginAtZero: true,
+        },
+      },
     },
   });
 }
@@ -174,6 +109,15 @@ function crearGraficoTrimestral(datos) {
     },
     options: {
       responsive: true,
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+        },
+      },
     },
   });
 }
