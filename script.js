@@ -2,8 +2,8 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // Configuración de Supabase
-const SUPABASE_URL = "https://<TU_SUPABASE_URL>"; // Reemplaza con tu URL de Supabase
-const SUPABASE_KEY = "<TU_SUPABASE_API_KEY>"; // Reemplaza con tu clave API de Supabase
+const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co"; // Reemplaza con tu URL de Supabase
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4"; // Reemplaza con tu clave API de Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Función principal para obtener y procesar datos
