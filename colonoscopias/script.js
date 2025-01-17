@@ -32,8 +32,8 @@ function procesarDatos(data) {
 function formatearDatosCronologicamente(datos) {
   const semanasOrdenadas = Object.keys(datos)
     .sort((a, b) => {
-      const semanaA = parseInt(a.replace('S', ''));
-      const semanaB = parseInt(b.replace('S', ''));
+      const semanaA = parseInt(a.replace('Sem ', ''));
+      const semanaB = parseInt(b.replace('Sem ', ''));
       return semanaA - semanaB;
     });
 
