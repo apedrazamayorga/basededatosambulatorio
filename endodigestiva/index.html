@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas de Procedimientos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+  <style>
+    canvas {
+      width: 100%;
+      max-width: 1200px;
+      height: 100%;
+      max-height: 400px:
+    }
+    .chart-container {
+      margin: 20px 0;
+    }
+    .chart-container h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="text-align: center;">Estadísticas de Procedimientos</h1>
+  </header>
+
+  <main>
+    <section class="chart-container">
+      <h3>Procedimientos por Semana</h3>
+      <canvas id="chartSemana"></canvas>
+    </section>
+
+    <section class="chart-container">
+      <h3>Procedimientos por Mes</h3>
+      <canvas id="chartMensual"></canvas>
+    </section>
+
+    <section class="chart-container">
+      <h3>Procedimientos por Trimestre</h3>
+      <canvas id="chartTrimestre"></canvas>
+    </section>
+  </main>
+
+  <footer>
+    <p style="text-align: center;">© 2025 Estadísticas de Procedimientos</p>
+  </footer>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
