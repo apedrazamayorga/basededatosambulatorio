@@ -83,14 +83,14 @@ function graficar(datos, titulo) {
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.3,
-        pointRadius: sortedValues.map(valor => (valor / 2) * 0.5), // Reducir el tamaño de los círculos al 50%
+        pointRadius: sortedValues.map(valor => (valor / 2) * 0.3), // Reducir el tamaño de los círculos al 50%
         pointHoverRadius: sortedValues.map(valor => (valor / 1.5) * 0.5), // También reducir al 50% el tamaño al pasar el mouse
         pointBackgroundColor: "rgba(75, 192, 192, 1)", // Color del círculo
       }],
     },
     options: {
       responsive: true, // Hacer que el gráfico sea responsivo
-      maintainAspectRatio: false, // Permitir que la relación de aspecto se adapte al contenedor
+      maintainAspectRatio: true, // Mantener la proporción
       plugins: {
         legend: {
           display: true, // Mostrar la leyenda con el total
@@ -119,6 +119,5 @@ function graficar(datos, titulo) {
     },
   });
 }
-
 
 obtenerDatos();
