@@ -63,13 +63,13 @@ function obtenerSemanaDelAno(fecha) {
 function graficar(datosSemana) {
   const ctx = document.getElementById("chartSemana").getContext("2d");
 
-  const minValor = Math.min(...datosSemana.valores);  // Mínimo valor
-  const maxValor = Math.max(...datosSemana.valores);  // Máximo valor
+  const minValor = 0;  // El eje Y comienza en 0
+  const maxValor = Math.max(...datosSemana.valores);  // Máximo valor de los datos
 
   new Chart(ctx, {
     type: "line",
     data: {
-      labels: datosSemana.labels,
+      labels: datosSemana.labels, // Semanas del año
       datasets: [{
         label: 'Colonoscopias por Semana',
         data: datosSemana.valores,
@@ -93,51 +93,19 @@ function graficar(datosSemana) {
       },
       scales: {
         y: {
-          beginAtZero: false,
-          min: minValor - 5, // Límites ajustados
-          max: maxValor + 5, // Límites ajustados
+          beginAtZero: true, // Inicia en 0
+          min: minValor,     // Mínimo en 0
+          max: maxValor,     // Máximo de los datos
           ticks: {
             color: '#000',
           },
-          grid: {
-            color: 'rgba(255, 0, 0, 0.2)',  // Línea horizontal en rojo pálido
-            lineWidth: 1,
+        },
+        x: {
+          beginAtZero: true,
+          ticks: {
+            color: '#000',
           },
         },
-      },
-      annotation: {
-        annotations: [
-          {
-            type: 'line',
-            mode: 'horizontal',
-            scaleID: 'y',
-            value: minValor,
-            borderColor: 'rgba(255, 99, 132, 0.5)',
-            borderWidth: 2,
-            label: {
-              enabled: true,
-              content: `Min: ${minValor}`,
-              position: 'left',
-              backgroundColor: 'rgba(255, 99, 132, 0.5)',
-              font: { color: '#000', size: 12 },
-            },
-          },
-          {
-            type: 'line',
-            mode: 'horizontal',
-            scaleID: 'y',
-            value: maxValor,
-            borderColor: 'rgba(255, 99, 132, 0.5)',
-            borderWidth: 2,
-            label: {
-              enabled: true,
-              content: `Max: ${maxValor}`,
-              position: 'left',
-              backgroundColor: 'rgba(255, 99, 132, 0.5)',
-              font: { color: '#000', size: 12 },
-            },
-          },
-        ],
       },
     },
   });
