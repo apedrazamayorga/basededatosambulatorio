@@ -36,7 +36,7 @@ function procesarDatos(data) {
   graficar("chartTrimestre", porTrimestre, "Colonoscopias por Trimestre");
 }
 
-// Agrupar por semana
+// Las demás funciones permanecen iguales
 function agruparPorSemana(fechas) {
   const semanas = {};
 
@@ -48,7 +48,6 @@ function agruparPorSemana(fechas) {
   return formatearDatos(semanas);
 }
 
-// Agrupar por mes
 function agruparPorMes(fechas) {
   const meses = {};
 
@@ -60,7 +59,6 @@ function agruparPorMes(fechas) {
   return formatearDatos(meses);
 }
 
-// Agrupar por trimestre
 function agruparPorTrimestre(fechas) {
   const trimestres = {};
 
@@ -72,7 +70,6 @@ function agruparPorTrimestre(fechas) {
   return formatearDatos(trimestres);
 }
 
-// Formatear datos para Chart.js
 function formatearDatos(datos) {
   return {
     labels: Object.keys(datos),
@@ -80,7 +77,6 @@ function formatearDatos(datos) {
   };
 }
 
-// Generar gráficos
 function graficar(canvasId, datos, titulo) {
   const ctx = document.getElementById(canvasId).getContext("2d");
   new Chart(ctx, {
@@ -117,7 +113,6 @@ function graficar(canvasId, datos, titulo) {
   });
 }
 
-// Obtener semana del año
 function obtenerSemanaDelAno(fecha) {
   const inicioAno = new Date(fecha.getFullYear(), 0, 1);
   const diasTranscurridos = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
