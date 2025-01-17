@@ -1,0 +1,48 @@
+/* Estilo general para el contenedor del gráfico */
+.chart-container {
+  position: relative;
+  height: 400px; /* Ajusta la altura según el tamaño que desees */
+  width: 80%; /* Ajusta el ancho según lo necesites */
+  margin: 0 auto; /* Centra los gráficos */
+}
+
+/* Estilo para los gráficos */
+canvas {
+  display: block;
+  width: 100% !important; /* Asegura que el gráfico ocupe todo el espacio del contenedor */
+  height: 100% !important; /* Asegura que el gráfico ocupe toda la altura del contenedor */
+}
+
+/* Estilo para los títulos */
+.chart-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Estilo para los ejes de los gráficos */
+.chart-axis {
+  font-size: 14px;
+  font-family: 'Arial', sans-serif; /* Puedes cambiar a la fuente que prefieras */
+  color: #333;
+}
+
+/* Ajustes específicos para los gráficos horizontales (mensuales) */
+.chart-horizontal .chart-container {
+  height: 500px; /* Aumenta la altura de los gráficos horizontales para mayor claridad */
+}
+
+/* Contenedor para los gráficos apilados */
+.chart-stacked {
+  display: flex;
+  justify-content: space-between; /* Distribuye mejor los gráficos apilados */
+  gap: 20px; /* Espacio entre los gráficos */
+}
+
+/* Estilo para la leyenda */
+.chart-legend {
+  font-size: 12px;
+  color: #555;
+  padding-top: 10px;
+}
