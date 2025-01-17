@@ -4,6 +4,8 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let chartSemana, chartMensual, chartTrimestre; // Variables para los gráficos
+
 async function obtenerDatos() {
   const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
 
@@ -12,35 +14,137 @@ async function obtenerDatos() {
     return;
   }
 
-  procesarDatos(data);
+  procesarDatosSemana(data);
+  procesarDatosMensual(data);
+  procesarDatosTrimestre(data);
 }
 
-function procesarDatos(data) {
+// Gráfico semanal
+function procesarDatosSemana(data) {
   const semanas = {};
   data.forEach(item => {
-    if (item.tipo_procedimiento === "colonoscopia") {
-      const fecha = new Date(item.fecha);
-      const semana = obtenerSemanaDelAno(fecha);
-      semanas[semana] = (semanas[semana] || 0) + 1;
-    }
+    const fecha = new Date(item.fecha);
+    const semana = obtenerSemanaDelAno(fecha);
+    semanas[semana] = (semanas[semana] || 0) + 1;
   });
 
-  const datosOrdenados = formatearDatosCronologicamente(semanas);
-  graficar(datosOrdenados, "Colonoscopias");
+  const etiquetas = Object.keys(semanas).sort((a, b) => parseInt(a.replace("S", ""), 10) - parseInt(b.replace("S", ""), 10));
+  const valores = etiquetas.map(semana => semanas[semana]);
+
+  graficar({
+    ctx: document.getElementById("chartSemana"),
+    etiquetas,
+    valores,
+    titulo: "Colonoscopias por Semana",
+  });
 }
 
-function formatearDatosCronologicamente(datos) {
-  const semanasOrdenadas = Object.keys(datos)
-    .sort((a, b) => {
-      const semanaA = parseInt(a.replace('Sem ', ''));
-      const semanaB = parseInt(b.replace('Sem ', ''));
-      return semanaA - semanaB;
-    });
+// Gráfico mensual y tabla acumulativa
+function procesarDatosMensual(data) {
+  const meses = {};
+  data.forEach(item => {
+    const fecha = new Date(item.fecha);
+    const mes = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
+    meses[mes] = (meses[mes] || 0) + 1;
+  });
 
-  return {
-    labels: semanasOrdenadas,
-    valores: semanasOrdenadas.map(semana => datos[semana]),
-  };
+  const etiquetas = Object.keys(meses).sort();
+  const valores = etiquetas.map(mes => meses[mes]);
+
+  // Crear gráfico
+  graficar({
+    ctx: document.getElementById("chartMensual"),
+    etiquetas,
+    valores,
+    titulo: "Colonoscopias por Mes",
+  });
+
+  // Llenar tabla acumulativa
+  llenarTablaMensual(etiquetas, valores);
+}
+
+// Tabla acumulativa mensual
+function llenarTablaMensual(etiquetas, valores) {
+  const tbody = document.getElementById("tablaMensual");
+  tbody.innerHTML = ""; // Limpiar la tabla
+
+  let acumulativo = 0;
+  etiquetas.forEach((etiqueta, index) => {
+    acumulativo += valores[index];
+    const fila = `<tr>
+      <td>${etiqueta}</td>
+      <td>${valores[index]}</td>
+      <td>${acumulativo}</td>
+    </tr>`;
+    tbody.innerHTML += fila;
+  });
+}
+
+// Gráfico trimestral
+function procesarDatosTrimestre(data) {
+  const trimestres = {};
+  data.forEach(item => {
+    const fecha = new Date(item.fecha);
+    const trimestre = obtenerTrimestre(fecha);
+    trimestres[trimestre] = (trimestres[trimestre] || 0) + 1;
+  });
+
+  const etiquetas = Object.keys(trimestres).sort();
+  const valores = etiquetas.map(trimestre => trimestres[trimestre]);
+
+  graficar({
+    ctx: document.getElementById("chartTrimestre"),
+    etiquetas,
+    valores,
+    titulo: "Colonoscopias por Trimestre",
+  });
+}
+
+// Función general para graficar
+function graficar({ ctx, etiquetas, valores, titulo }) {
+  const minValor = Math.min(...valores);
+  const maxValor = Math.max(...valores);
+  const suggestedMin = Math.floor(minValor / 10) * 10;
+  const suggestedMax = Math.ceil(maxValor / 10) * 10;
+
+  if (ctx.chart) {
+    ctx.chart.destroy(); // Destruir gráfico existente si hay uno
+  }
+
+  ctx.chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: titulo,
+        data: valores,
+        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        tension: 0.3,
+        pointRadius: valores.map(valor => Math.max(valor / 5, 3)),
+        pointHoverRadius: valores.map(valor => Math.max(valor / 5, 5)),
+        pointBackgroundColor: "rgba(75, 192, 192, 1)",
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: {
+            autoSkip: false,
+          },
+        },
+        y: {
+          suggestedMin: suggestedMin,
+          suggestedMax: suggestedMax,
+          ticks: {
+            stepSize: 10,
+          },
+        },
+      },
+    },
+  });
 }
 
 function obtenerSemanaDelAno(fecha) {
@@ -49,75 +153,11 @@ function obtenerSemanaDelAno(fecha) {
   return `S${Math.ceil((dias + inicioAno.getDay() + 1) / 7)}`;
 }
 
-function graficar(datos, titulo) {
-  const ctx = document.getElementById("chartSemana").getContext("2d");
-
-  // Calcular valores mínimos y máximos ajustados a las decenas
-  const minValor = Math.min(...datos.valores);
-  const maxValor = Math.max(...datos.valores);
-  const suggestedMin = Math.floor(minValor / 10) * 10; // Redondear hacia abajo a la decena previa
-  const suggestedMax = Math.ceil(maxValor / 10) * 10;  // Redondear hacia arriba a la decena posterior
-
-  // Ordenar cronológicamente las semanas
-  const sortedLabels = datos.labels.slice().sort((a, b) => {
-    const numA = parseInt(a.replace("S", ""), 10); // Extraer el número de la semana
-    const numB = parseInt(b.replace("S", ""), 10);
-    return numA - numB; // Ordenar numéricamente
-  });
-
-  const sortedValues = sortedLabels.map(label => {
-    const index = datos.labels.indexOf(label); // Encontrar el índice en los datos originales
-    return datos.valores[index];
-  });
-
-  // Calcular el total de procedimientos
-  const totalProcedimientos = sortedValues.reduce((a, b) => a + b, 0);
-
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: sortedLabels,
-      datasets: [{
-        label: `${titulo} (Total: ${totalProcedimientos})`, // Mostrar el total en la leyenda
-        data: sortedValues,
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        tension: 0.3,
-        pointRadius: sortedValues.map(valor => (valor / 2) * 0.3), // Reducir el tamaño de los círculos al 50%
-        pointHoverRadius: sortedValues.map(valor => (valor / 1.5) * 0.5), // También reducir al 50% el tamaño al pasar el mouse
-        pointBackgroundColor: "rgba(75, 192, 192, 1)", // Color del círculo
-      }],
-    },
-    options: {
-      responsive: true, // Hacer que el gráfico sea responsivo
-      maintainAspectRatio: true, // Mantener la proporción
-      plugins: {
-        legend: {
-          display: true, // Mostrar la leyenda con el total
-          labels: {
-            font: {
-              size: 14,
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            autoSkip: false, // Asegurar que se muestren todas las etiquetas de semanas
-          },
-        },
-        y: {
-          beginAtZero: false, // Permite ajustar los límites de la escala manualmente
-          suggestedMin: suggestedMin, // Usar la decena previa
-          suggestedMax: suggestedMax, // Usar la decena posterior
-          ticks: {
-            stepSize: 10, // Opcional: Ajusta los pasos entre números si deseas más control
-          },
-        },
-      },
-    },
-  });
+function obtenerTrimestre(fecha) {
+  const year = fecha.getFullYear();
+  const month = fecha.getMonth(); // Meses: 0-11
+  const trimestre = Math.floor(month / 3) + 1;
+  return `Q${trimestre} ${year}`;
 }
 
 obtenerDatos();
