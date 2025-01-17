@@ -1,4 +1,23 @@
-// Datos de ejemplo para colonoscopias y gastroduodenoscopias
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function obtenerDatosEndoscopia() {
+      const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
+
+      if (error) {
+        console.error("Error al obtener datos:", error);
+        return;
+      }
+
+      procesarDatosSemanales(data);
+      procesarDatosMensuales(data);
+      procesarDatosTrimestrales(data);
+    }
+
+  // Datos de ejemplo para colonoscopias y gastroduodenoscopias
 const datosSemanales = {
   labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
   colonoscopias: [10, 15, 8, 12],
