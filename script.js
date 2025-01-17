@@ -36,6 +36,13 @@ function procesarDatos(data) {
   graficar("chartTrimestre", porTrimestre, "Colonoscopias por Trimestre");
 }
 
+// Función para obtener la semana del año
+function obtenerSemanaDelAno(fecha) {
+  const inicioAno = new Date(fecha.getFullYear(), 0, 1);
+  const diasTranscurridos = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
+  return `S${Math.ceil((diasTranscurridos + inicioAno.getDay() + 1) / 7)}-${fecha.getFullYear()}`;
+}
+
 // Agrupar por semana, mes y trimestre (mismo código)
 function agruparPorSemana(fechas) {
   const semanas = {};
