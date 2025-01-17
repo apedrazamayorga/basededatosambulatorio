@@ -5,7 +5,13 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function obtenerDatosColonoscopia() {
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function obtenerDatos() {
   const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
 
   if (error) {
@@ -13,12 +19,11 @@ async function obtenerDatosColonoscopia() {
     return;
   }
 
-  procesarDatosColonoscopia(data);
+  procesarDatos(data);
 }
 
-function procesarDatosColonoscopia(data) {
+function procesarDatos(data) {
   const semanas = {};
-
   data.forEach(item => {
     if (item.tipo_procedimiento === "colonoscopia") {
       const fecha = new Date(item.fecha);
@@ -27,14 +32,16 @@ function procesarDatosColonoscopia(data) {
     }
   });
 
+  const datosOrdenados = formatearDatosCronologicamente(semanas);
+  graficar(datosOrdenados, "Colonoscopias por Semana");
+}
+
 function formatearDatosCronologicamente(datos) {
-  // Ordenar las semanas de manera numérica
   const semanasOrdenadas = Object.keys(datos)
     .sort((a, b) => {
-      // Extraer el número de semana de las cadenas "S1", "S2", ..., "S20"
       const semanaA = parseInt(a.replace('S', ''));
       const semanaB = parseInt(b.replace('S', ''));
-      return semanaA - semanaB;  // Ordenar de menor a mayor
+      return semanaA - semanaB;
     });
 
   return {
@@ -42,7 +49,7 @@ function formatearDatosCronologicamente(datos) {
     valores: semanasOrdenadas.map(semana => datos[semana]),
   };
 }
-  
+
 function obtenerSemanaDelAno(fecha) {
   const inicioAno = new Date(fecha.getFullYear(), 0, 1);
   const dias = Math.floor((fecha - inicioAno) / (24 * 60 * 60 * 1000));
@@ -66,20 +73,15 @@ function graficar(datos, titulo) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true, // Asegúrate de que el gráfico mantenga la relación de aspecto
-      aspectRatio: 2,  // Esto bloquea la relación de aspecto (2:1, ajustable según necesidad)
+      maintainAspectRatio: true,
+      aspectRatio: 2,
       scales: {
         y: {
           beginAtZero: true,
-          ticks: {
-            // Establece los valores máximos y mínimos de la escala Y según los datos
-            max: Math.max(...datos.valores) * 1.2, // Un 20% más alto que el valor máximo
-            min: 0,
-          },
         },
       },
     },
   });
 }
-obtenerDatosColonoscopia();
 
+obtenerDatos();
