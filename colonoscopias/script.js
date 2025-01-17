@@ -4,7 +4,7 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  async function obtenerDatos() {
+async function obtenerDatos() {
       const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento");
 
       if (error) {
@@ -97,8 +97,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         backgroundColor: colores,
         borderColor: colores.map(color => color.replace("0.6", "1")),
         borderWidth: 1,
-        pointRadius: tipoPunto === "circle" ? 5 : 0,
-        hoverRadius: tipoPunto === "circle" ? 10 : 0,
+        pointRadius: tipoPunto === "circle" ? 20 : 0,
+        hoverRadius: tipoPunto === "circle" ? 40 : 0,
       }];
 
       const options = {
@@ -152,8 +152,12 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     obtenerDatos();
 
-    // Función para ajustar gráficos al tamaño de la ventana
+    // Evitar ajuste constante con debounce
+    let resizeTimeout;
     window.addEventListener("resize", function() {
-      const charts = Chart.instances;
-      charts.forEach(chart => chart.resize());
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function() {
+        const charts = Chart.instances;
+        charts.forEach(chart => chart.resize());
+      }, 100);
     });
