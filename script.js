@@ -43,7 +43,6 @@ function obtenerSemanaDelAno(fecha) {
   return `S${Math.ceil((diasTranscurridos + inicioAno.getDay() + 1) / 7)}-${fecha.getFullYear()}`;
 }
 
-// Agrupar por semana, mes y trimestre (mismo código)
 function agruparPorSemana(fechas) {
   const semanas = {};
   fechas.forEach((fecha) => {
@@ -124,7 +123,7 @@ function graficar(canvasId, datos, titulo) {
   });
 }
 
-// Calcular la línea de tendencia (simple promedio móvil)
+// Calcular la línea de tendencia (promedio móvil)
 function calcularTendencia(valores) {
   let tendencia = [];
   for (let i = 0; i < valores.length; i++) {
