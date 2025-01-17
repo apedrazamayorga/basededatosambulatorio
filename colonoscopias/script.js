@@ -58,28 +58,39 @@ function graficar(datos, titulo) {
   const suggestedMin = Math.floor(minValor / 10) * 10; // Redondear hacia abajo a la decena previa
   const suggestedMax = Math.ceil(maxValor / 10) * 10;  // Redondear hacia arriba a la decena posterior
 
+  // Ordenar cronológicamente las semanas
+  const sortedLabels = datos.labels.slice().sort((a, b) => {
+    const numA = parseInt(a.replace("S", ""), 10); // Extraer el número de la semana
+    const numB = parseInt(b.replace("S", ""), 10);
+    return numA - numB; // Ordenar numéricamente
+  });
+
+  const sortedValues = sortedLabels.map(label => {
+    const index = datos.labels.indexOf(label); // Encontrar el índice en los datos originales
+    return datos.valores[index];
+  });
+
   // Calcular el total de procedimientos
-  const totalProcedimientos = datos.valores.reduce((a, b) => a + b, 0);
+  const totalProcedimientos = sortedValues.reduce((a, b) => a + b, 0);
 
   new Chart(ctx, {
     type: "line",
     data: {
-      labels: datos.labels,
+      labels: sortedLabels,
       datasets: [{
         label: `${titulo} (Total: ${totalProcedimientos})`, // Mostrar el total en la leyenda
-        data: datos.valores,
+        data: sortedValues,
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.3,
-        pointRadius: datos.valores.map(valor => valor / 2), // Tamaño del círculo proporcional a la cantidad
-        pointHoverRadius: datos.valores.map(valor => valor / 1.5), // Aumenta al pasar el mouse
+        pointRadius: sortedValues.map(valor => (valor / 2) * 0.5), // Reducir el tamaño de los círculos al 50%
+        pointHoverRadius: sortedValues.map(valor => (valor / 1.5) * 0.5), // También reducir al 50% el tamaño al pasar el mouse
         pointBackgroundColor: "rgba(75, 192, 192, 1)", // Color del círculo
       }],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 2,
+      responsive: true, // Hacer que el gráfico sea responsivo
+      maintainAspectRatio: false, // Permitir que la relación de aspecto se adapte al contenedor
       plugins: {
         legend: {
           display: true, // Mostrar la leyenda con el total
@@ -91,6 +102,11 @@ function graficar(datos, titulo) {
         },
       },
       scales: {
+        x: {
+          ticks: {
+            autoSkip: false, // Asegurar que se muestren todas las etiquetas de semanas
+          },
+        },
         y: {
           beginAtZero: false, // Permite ajustar los límites de la escala manualmente
           suggestedMin: suggestedMin, // Usar la decena previa
@@ -103,5 +119,6 @@ function graficar(datos, titulo) {
     },
   });
 }
+
 
 obtenerDatos();
