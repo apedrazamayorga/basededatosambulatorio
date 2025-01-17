@@ -1,25 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Colonoscopias por Periodo</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/@supabase/supabase-js"></script>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
-</head>
-
+  <title>Colonoscopias por Semana</title>
+  <link rel="stylesheet" href="assets/styles/styles.css">
 </head>
 <body>
-  <h1>Gráficos de Colonoscopias</h1>
-  <h2>Colonoscopias por Semana</h2>
-  <canvas id="chartSemana" width="400" height="200"></canvas>
-  <h2>Colonoscopias por Mes</h2>
-  <canvas id="chartMes" width="400" height="200"></canvas>
-  <h2>Colonoscopias por Trimestre</h2>
-  <canvas id="chartTrimestre" width="400" height="200"></canvas>
-
-  <script src="script.js" type="module"></script>
+  <h1>Colonoscopias por Semana</h1>
+  <div>
+    <canvas id="chartSemana"></canvas>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="scripts/script.js"></script>
 </body>
 </html>
