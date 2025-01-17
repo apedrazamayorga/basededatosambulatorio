@@ -169,7 +169,7 @@ function crearGraficoMensual(datos) {
 function crearGraficoTrimestral(datos) {
   const ctx = document.getElementById("chartTrimestre").getContext("2d");
   new Chart(ctx, {
-    type: "bar",
+    type: "horizontalBar",
     data: {
       labels: datos.labels,
       datasets: [
