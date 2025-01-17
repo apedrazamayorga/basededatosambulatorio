@@ -1,6 +1,6 @@
 /* Estilo para el cuerpo de la página */
 body {
-  font-family: 'Montserrat', sans-serif;  /* Fuente más moderna */
+  font-family: 'Montserrat', sans-serif;
   background-color: #ffffff;
   color: #343a40;
   margin: 0;
@@ -9,14 +9,16 @@ body {
 }
 
 /* Estilo para los encabezados */
-h1, h2 {
-  color: #007bff;
+h1 {
+  color: #000000;
   margin-bottom: 20px;
+  text-align: left;
 }
 
 /* Centrar los gráficos y agregar espacio */
 canvas {
   width: 800px;
+  height: 500px;
   margin: 20px auto;
   display: block;
 }
@@ -28,29 +30,5 @@ div {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
   border-radius: 8px;
-  max-width: 900px;
-}
-
-/* Estilo para las etiquetas */
-label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-/* Botones y enlaces */
-button, a {
-  background-color: #007bff;
-  color: #ffffff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 10px 0;
-}
-
-button:hover, a:hover {
-  background-color: #0056b3;
+  max-width: 100%;
 }
