@@ -3,62 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Colonoscopias por Semana</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Colonoscopias Gráficos</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      padding: 0;
-    }
-    h1, h2, h3 {
-      text-align: left;
-    }
+  <style>
     canvas {
-      margin: 20px auto;
-      display: block;
       max-width: 100%;
+      height: 400px;
     }
     table {
-      width: 80%;
-      margin: 20px auto;
+      width: 100%;
       border-collapse: collapse;
-      text-align: center;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid black;
     }
     th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
-    th {
-      background-color: #f2f2f2;
+      padding: 10px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>Colonoscopias: Análisis por Semanas, Meses y Trimestres</h1>
 
-  <h2>Colonoscopias por Semana</h2>
-  <canvas id="chartSemana"></canvas>
+  <div>
+    <h3>Colonoscopias por Semana</h3>
+    <canvas id="chartSemana"></canvas>
+  </div>
 
-  <h2>Colonoscopias por Mes</h2>
-  <canvas id="chartMensual"></canvas>
+  <div>
+    <h3>Colonoscopias por Mes</h3>
+    <canvas id="chartMensual"></canvas>
+    <table id="tablaMensual">
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th>Total</th>
+          <th>Acumulado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Tabla se llenará dinámicamente -->
+      </tbody>
+    </table>
+  </div>
 
-  <h3>Datos Acumulativos Mensuales</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Mes</th>
-        <th>Total Colonoscopias</th>
-        <th>Acumulativo</th>
-      </tr>
-    </thead>
-    <tbody id="tablaMensual"></tbody>
-  </table>
-
-  <h2>Colonoscopias por Trimestre</h2>
-  <canvas id="chartTrimestre"></canvas>
+  <div>
+    <h3>Colonoscopias por Trimestre</h3>
+    <canvas id="chartTrimestre"></canvas>
+  </div>
   
   <script type="module" src="script.js"></script>
 </body>
