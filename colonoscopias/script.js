@@ -17,7 +17,7 @@ async function obtenerDatos() {
   procesarDatosTrimestre(data);
 }
 
-// Gráfico semanal
+// Gráfico semanal (líneas)
 function procesarDatosSemana(data) {
   const semanas = {};
   data.forEach(item => {
@@ -33,11 +33,12 @@ function procesarDatosSemana(data) {
     ctx: document.getElementById("chartSemana").getContext("2d"),
     etiquetas,
     valores,
+    tipo: "line",
     titulo: "Colonoscopias por Semana",
   });
 }
 
-// Gráfico mensual y tabla acumulativa
+// Gráfico mensual (barras horizontales)
 function procesarDatosMensual(data) {
   const meses = {};
   data.forEach(item => {
@@ -54,7 +55,9 @@ function procesarDatosMensual(data) {
     ctx: document.getElementById("chartMensual").getContext("2d"),
     etiquetas,
     valores,
+    tipo: "bar",
     titulo: "Colonoscopias por Mes",
+    orientacion: "horizontal", // Orientación horizontal
   });
 
   // Llenar tabla acumulativa
@@ -78,7 +81,7 @@ function llenarTablaMensual(etiquetas, valores) {
   });
 }
 
-// Gráfico trimestral
+// Gráfico trimestral (barras verticales)
 function procesarDatosTrimestre(data) {
   const trimestres = {};
   data.forEach(item => {
@@ -94,52 +97,44 @@ function procesarDatosTrimestre(data) {
     ctx: document.getElementById("chartTrimestre").getContext("2d"),
     etiquetas,
     valores,
+    tipo: "bar",
     titulo: "Colonoscopias por Trimestre",
   });
 }
 
 // Función general para graficar
-function graficar({ ctx, etiquetas, valores, titulo }) {
-  const minValor = Math.min(...valores);
-  const maxValor = Math.max(...valores);
-  const suggestedMin = Math.floor(minValor / 10) * 10;
-  const suggestedMax = Math.ceil(maxValor / 10) * 10;
+function graficar({ ctx, etiquetas, valores, tipo, titulo, orientacion }) {
+  const colores = etiquetas.map(() => `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.6)`);
 
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: etiquetas,
-      datasets: [{
-        label: titulo,
-        data: valores,
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        tension: 0.3,
-        pointRadius: valores.map(valor => Math.max(valor / 10, 3)),
-        pointHoverRadius: valores.map(valor => Math.max(valor / 10, 5)),
-        pointBackgroundColor: "rgba(75, 192, 192, 1)",
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      scales: {
-        x: {
-          ticks: {
-            autoSkip: true,
-            maxRotation: 0,
-            minRotation: 0,
-          },
-        },
-        y: {
-          suggestedMin: suggestedMin,
-          suggestedMax: suggestedMax,
-          ticks: {
-            stepSize: 10,
-          },
-        },
+  const datasets = [{
+    label: titulo,
+    data: valores,
+    backgroundColor: colores,
+    borderColor: colores.map(color => color.replace("0.6", "1")),
+    borderWidth: 1,
+  }];
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: true,
+    indexAxis: orientacion === "horizontal" ? "y" : "x",
+    scales: {
+      x: {
+        beginAtZero: true,
+      },
+      y: {
+        beginAtZero: true,
       },
     },
+  };
+
+  new Chart(ctx, {
+    type: tipo,
+    data: {
+      labels: etiquetas,
+      datasets,
+    },
+    options,
   });
 }
 
@@ -155,7 +150,5 @@ function obtenerTrimestre(fecha) {
   const trimestre = Math.floor(month / 3) + 1;
   return `Q${trimestre} ${year}`;
 }
-
-obtenerDatos();
 
 obtenerDatos();
