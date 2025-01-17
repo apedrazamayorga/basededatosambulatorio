@@ -91,7 +91,7 @@ function graficar(datosSemana) {
         legend: { position: "top" },
         title: {
           display: true,
-          text: "Colonoscopias por Semana",
+          text: "Colonoscopias",
           color: "#000",
           align: "start",
         },
