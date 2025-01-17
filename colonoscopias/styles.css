@@ -9,7 +9,7 @@ body {
 }
 
 /* Estilo para los encabezados */
-h1 {
+h1, h2, h3 {
   color: #000000;
   margin-bottom: 20px;
   text-align: left;
