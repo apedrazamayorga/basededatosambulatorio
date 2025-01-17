@@ -75,6 +75,11 @@ function graficar(datosSemana) {
         data: datosSemana.valores,
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
+        tension: 0.3,
+        borderWidth: 2,
+        pointStyle: "circle",
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(75, 192, 192, 1)",
         fill: false,
         borderWidth: 2
       }],
