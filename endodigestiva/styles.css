@@ -10,7 +10,9 @@
 canvas {
   display: block;
   width: 100% !important;
+  max-width: 800px;
   height: 100% !important;
+  max-height: 400px;
 }
 
 /* Si usas flexbox, puedes añadir más control a la disposición */
