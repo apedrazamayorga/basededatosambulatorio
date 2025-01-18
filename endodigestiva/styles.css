@@ -26,5 +26,6 @@
   .grafico {
     max-width: 100%;     /* Asegura que los gráficos se adapten al ancho de pantalla */
     height: auto;        /* Ajusta la altura automáticamente */
+    max-height: 100%;
   }
 }
