@@ -147,6 +147,8 @@ function crearGraficoMensual(datos) {
       indexAxis: 'y',
       responsive: true,
       scales: {
+        x: {
+                stacked: true,
         y: {
           beginAtZero: true,
           stacked: true,
