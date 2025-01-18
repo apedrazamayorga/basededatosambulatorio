@@ -146,7 +146,7 @@ function crearGraficoMensual(datos) {
     options: {
       responsive: true,
       scales: {
-        y: {
+        x: {
           beginAtZero: true,
         },
       },
