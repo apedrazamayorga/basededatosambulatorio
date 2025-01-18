@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Estadísticas de Procedimientos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1 style="text-align: center;">Estadísticas de Procedimientos</h1>
+  </header>
 
+  <main>
+    <div>
+      <canvas id="chartMensualProfesional" style="width: 100%; height: 400px;"></canvas>
+    </div>
+    <div>
+      <canvas id="chartTrimestralProfesional" style="width: 100%; height: 400px;"></canvas>
+    </div>
+    <div>
+      <canvas id="chartAnualProfesional" style="width: 100%; height: 400px;"></canvas>
+    </div>
+  </main>
+
+  <footer>
+    <p style="text-align: center;">EndoData. © 2025 Estadísticas de Procedimientos</p>
+  </footer>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
