@@ -115,7 +115,6 @@ function crearGraficoSemanal(datos) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
@@ -146,7 +145,6 @@ function crearGraficoMensual(datos) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
@@ -178,7 +176,6 @@ function crearGraficoTrimestral(datos) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
