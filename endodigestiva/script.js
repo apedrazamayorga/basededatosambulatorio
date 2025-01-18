@@ -92,7 +92,7 @@ function procesarDatosTrimestrales(data) {
 
 function crearGraficoSemanal(datos) {
 const ctx = document.getElementById("chartSemana").getContext("2d");
-const stackedBar = new Chart(ctx, {
+new Chart(ctx, {
     type: "line",
     data: {
       labels: datos.labels,
@@ -118,7 +118,6 @@ const stackedBar = new Chart(ctx, {
       scales: {
         y: {
           beginAtZero: true,
-          stacked: true,
         },
       },
     },
@@ -127,7 +126,7 @@ const stackedBar = new Chart(ctx, {
 
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
-  new Chart(ctx, {
+  const stackedBar = new Chart(ctx, {
     type: "bar",
     data: {
       labels: datos.labels,
@@ -150,6 +149,7 @@ function crearGraficoMensual(datos) {
       scales: {
         y: {
           beginAtZero: true,
+          stacked: true,
         },
       },
     },
