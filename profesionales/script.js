@@ -1,4 +1,3 @@
-
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
@@ -149,4 +148,3 @@ function crearGraficoAnualPorProfesional(datos) {
 
 // Llamar a la función para iniciar el proceso
 obtenerDatosPorProfesional();
-
