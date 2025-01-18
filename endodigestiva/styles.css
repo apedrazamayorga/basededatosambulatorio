@@ -12,6 +12,8 @@ canvas {
   display: block;
   width: 100% !important;
   height: 100% !important;
+  max-width: 800px; /* Limita el tamaño máximo de los gráficos */
+  max-height: 400px;
 }
 
 /* Si usas flexbox, puedes añadir más control a la disposición */
