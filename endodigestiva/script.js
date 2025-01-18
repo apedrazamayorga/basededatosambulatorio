@@ -148,10 +148,11 @@ function crearGraficoMensual(datos) {
       responsive: true,
       scales: {
         x: {
-                stacked: true,
+          stacked: true,
         },
         y: {
           beginAtZero: true,
+          stacked: true,
         },
       },
     },
