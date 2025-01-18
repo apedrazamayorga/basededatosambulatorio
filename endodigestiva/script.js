@@ -151,7 +151,7 @@ function crearGraficoMensual(datos) {
       ],
     },
     options: {
-      responsive: true, // Desactiva el redimensionamiento automático
+      responsive: false, // Desactiva el redimensionamiento automático
       maintainAspectRatio: true, // Permite ajustar el tamaño del canvas libremente
       scales: {
         // Eje X (horizontales, representando las categorías)
