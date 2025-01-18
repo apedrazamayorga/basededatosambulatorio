@@ -140,29 +140,29 @@ function crearGraficoMensual(datos) {
           label: "Colonoscopias",
           data: datos.colonoscopias,
           backgroundColor: "rgba(75, 192, 192, 1)",
-          barThickness: 20,  // Ajustar grosor de las barras (más delgadas)
+          barThickness: 20,  // Ajustar grosor de las barras 
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
           backgroundColor: "rgba(255, 99, 132, 1)",
-          barThickness: 20,  // Ajustar grosor de las barras (más delgadas)
+          barThickness: 20,  // Ajustar grosor de las barras 
         },
       ],
     },
     options: {
       responsive: true, // Desactiva el redimensionamiento automático
-      maintainAspectRatio: false, // Permite ajustar el tamaño del canvas libremente
+      maintainAspectRatio: true, // Permite ajustar el tamaño del canvas libremente
       scales: {
         // Eje X (horizontales, representando las categorías)
-        x: {
+        y: {
           stacked: true,  // Apilamiento de las barras
           beginAtZero: true,
           barPercentage: 0.8,  // Reducir el porcentaje de la barra (más delgadas)
           categoryPercentage: 0.4,  // Reducir espacio entre las barras
         },
         // Eje Y (valores)
-        y: {
+        x: {
           stacked: true,
           beginAtZero: true,
           ticks: {
