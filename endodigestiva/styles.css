@@ -3,16 +3,15 @@
   margin: 50px auto; /* Añade margen para separar los gráficos */
   width: 80%; /* Puedes ajustar el ancho de los gráficos */
   max-width: 800px; /* Limita el tamaño máximo de los gráficos */
-  height: 300px; /* Ajusta la altura del gráfico */
+  height: 80%; /* Ajusta la altura del gráfico */
+  max-height: 400px;
 }
 
 /* Asegúrate de que cada canvas (gráfico) ocupe el 100% del contenedor */
 canvas {
   display: block;
   width: 100% !important;
-  max-width: 800px;
   height: 100% !important;
-  max-height: 400px;
 }
 
 /* Si usas flexbox, puedes añadir más control a la disposición */
