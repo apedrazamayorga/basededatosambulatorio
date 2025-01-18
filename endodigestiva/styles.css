@@ -36,18 +36,6 @@ canvas {
   color: #333;
 }
 
-/* Ajustes específicos para los gráficos horizontales (mensuales) */
-.chart-horizontal .chart-container {
-  height: 300px; /* Aumenta la altura de los gráficos horizontales para mayor claridad */
-}
-
-/* Contenedor para los gráficos apilados */
-.chart-stacked {
-  display: flex;
-  justify-content: space-between; /* Distribuye mejor los gráficos apilados */
-  gap: 20px; /* Espacio entre los gráficos */
-}
-
 /* Estilo para la leyenda */
 .chart-legend {
   font-size: 12px;
