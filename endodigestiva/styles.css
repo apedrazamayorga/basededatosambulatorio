@@ -5,13 +5,11 @@
   align-items: center;    /* Centra los gráficos horizontalmente */
   gap: 20px;              /* Espacio entre cada gráfico */
   padding: 20px;          /* Espaciado interno del contenedor */
-  max-width: 1200px;      /* Ancho máximo del contenedor */
-  margin: 0 auto;         /* Centra el contenedor en la página */
+  max-width: 1000px;      /* Ancho máximo del contenedor */
 }
 
 /* Estilo para cada canvas (gráfico) */
 .grafico {
-  width: 100%;            /* Hace que los gráficos ocupen todo el ancho disponible */
   max-width: 1200px;       /* Limita el ancho máximo de cada gráfico */
   height: 600px;          /* Establece una altura fija para los gráficos */
 }
