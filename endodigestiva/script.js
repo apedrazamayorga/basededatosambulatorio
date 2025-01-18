@@ -152,7 +152,6 @@ function crearGraficoMensual(datos) {
         },
         y: {
           beginAtZero: true,
-          stacked: true,
         },
       },
     },
