@@ -76,7 +76,7 @@ function procesarDatosPorProfesional(data, periodo) {
 // Función para crear gráfico mensual por profesional
 function crearGraficoMensualPorProfesional(datos) {
   const ctx = document.getElementById("chartMensualProfesional").getContext("2d");
-  new Chart(ctx, {
+  const stackedBar = new Chart(ctx, {
     type: "bar",
     data: {
       labels: datos.labels,
@@ -90,11 +90,12 @@ function crearGraficoMensualPorProfesional(datos) {
         },
       },
       scales: {
-        x: {
-          stacked: false,
-        },
         y: {
+          stacked: true,
+        },
+        x: {
           beginAtZero: true,
+          stacked: true,
         },
       },
     },
