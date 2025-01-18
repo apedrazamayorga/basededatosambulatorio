@@ -149,6 +149,7 @@ function crearGraficoMensual(datos) {
       scales: {
         x: {
                 stacked: true,
+        },
         y: {
           beginAtZero: true,
           stacked: true,
