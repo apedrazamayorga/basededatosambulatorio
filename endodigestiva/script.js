@@ -93,7 +93,7 @@ function procesarDatosTrimestrales(data) {
 function crearGraficoSemanal(datos) {
   const ctx = document.getElementById("chartSemana").getContext("2d");
   new Chart(ctx, {
-    type: "line", // Tipo de gráfico (línea)
+    type: "line",
     data: {
       labels: datos.labels,
       datasets: [
@@ -103,8 +103,6 @@ function crearGraficoSemanal(datos) {
           borderColor: "rgba(75, 192, 192, 1)",
           backgroundColor: "rgba(75, 192, 192, 0.2)",
           tension: 0.3,
-          pointRadius: 10,
-          pointHoverRadius: 20,
         },
         {
           label: "Gastroduodenoscopias",
@@ -112,14 +110,12 @@ function crearGraficoSemanal(datos) {
           borderColor: "rgba(255, 99, 132, 1)",
           backgroundColor: "rgba(255, 99, 132, 0.2)",
           tension: 0.3,
-          pointRadius: 10,
-          pointHoverRadius: 20,
         },
       ],
     },
     options: {
-      responsive: false,
-      maintainAspectRatio: true,
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
@@ -132,7 +128,7 @@ function crearGraficoSemanal(datos) {
 function crearGraficoMensual(datos) {
   const ctx = document.getElementById("chartMensual").getContext("2d");
   new Chart(ctx, {
-    type: "bar",  // Mantener tipo "bar" para barras horizontales
+    type: "bar",
     data: {
       labels: datos.labels,
       datasets: [
@@ -140,34 +136,21 @@ function crearGraficoMensual(datos) {
           label: "Colonoscopias",
           data: datos.colonoscopias,
           backgroundColor: "rgba(75, 192, 192, 1)",
-          barThickness: 20,  // Ajustar grosor de las barras 
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
           backgroundColor: "rgba(255, 99, 132, 1)",
-          barThickness: 20,  // Ajustar grosor de las barras 
         },
       ],
     },
     options: {
-      responsive: false, // Desactiva el redimensionamiento automático
-      maintainAspectRatio: true, // Permite ajustar el tamaño del canvas libremente
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
-        // Eje X (horizontales, representando las categorías)
         y: {
-          stacked: true,  // Apilamiento de las barras
           beginAtZero: true,
-          barPercentage: 0.8,  // Reducir el porcentaje de la barra (más delgadas)
-          categoryPercentage: 0.4,  // Reducir espacio entre las barras
-        },
-        // Eje Y (valores)
-        x: {
-          stacked: true,
-          beginAtZero: true,
-          ticks: {
-            maxTicksLimit: 10,  // Limitar el número de ticks en el eje Y
-          },
+          max: 50,
         },
       },
     },
@@ -177,7 +160,7 @@ function crearGraficoMensual(datos) {
 function crearGraficoTrimestral(datos) {
   const ctx = document.getElementById("chartTrimestre").getContext("2d");
   new Chart(ctx, {
-    type: "Bar",
+    type: "bar",
     data: {
       labels: datos.labels,
       datasets: [
@@ -185,26 +168,21 @@ function crearGraficoTrimestral(datos) {
           label: "Colonoscopias",
           data: datos.colonoscopias,
           backgroundColor: "rgba(75, 192, 192, 1)",
-          barThickness: 12,  // Ajustamos el grosor de las barras
         },
         {
           label: "Gastroduodenoscopias",
           data: datos.gastroduodenoscopias,
           backgroundColor: "rgba(255, 99, 132, 1)",
-          barThickness: 12,  // Ajustamos el grosor de las barras
         },
       ],
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
-        x: {
-          stacked: true,
-          beginAtZero: true,
-        },
         y: {
-          stacked: true,
           beginAtZero: true,
+          max: 50,
         },
       },
     },
