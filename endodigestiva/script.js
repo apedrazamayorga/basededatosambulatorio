@@ -118,6 +118,7 @@ const stackedBar = new Chart(ctx, {
       scales: {
         y: {
           beginAtZero: true,
+          stacked: true,
         },
       },
     },
