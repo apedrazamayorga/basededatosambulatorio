@@ -148,7 +148,6 @@ function crearGraficoMensual(datos) {
       scales: {
         y: {
           beginAtZero: true,
-          max: 50,
         },
       },
     },
@@ -179,7 +178,6 @@ function crearGraficoTrimestral(datos) {
       scales: {
         y: {
           beginAtZero: true,
-          max: 50,
         },
       },
     },
