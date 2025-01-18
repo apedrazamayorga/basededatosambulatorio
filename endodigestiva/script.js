@@ -118,8 +118,8 @@ function crearGraficoSemanal(datos) {
       ],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: false,
+      maintainAspectRatio: true,
       scales: {
         y: {
           beginAtZero: true,
