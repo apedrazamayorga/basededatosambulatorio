@@ -91,8 +91,8 @@ function procesarDatosTrimestrales(data) {
 }
 
 function crearGraficoSemanal(datos) {
-  const ctx = document.getElementById("chartSemana").getContext("2d");
-  new Chart(ctx, {
+const ctx = document.getElementById("chartSemana").getContext("2d");
+const stackedBar = new Chart(ctx, {
     type: "line",
     data: {
       labels: datos.labels,
