@@ -83,6 +83,7 @@ function crearGraficoMensualPorProfesional(datos) {
       datasets: datos.datasets,
     },
     options: {
+      indexAxis: 'y',
       responsive: true,
       plugins: {
         legend: {
@@ -90,10 +91,10 @@ function crearGraficoMensualPorProfesional(datos) {
         },
       },
       scales: {
-        y: {
+        x: {
           stacked: true,
         },
-        x: {
+        y: {
           beginAtZero: true,
           stacked: true,
         },
