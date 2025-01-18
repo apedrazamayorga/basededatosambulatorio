@@ -22,9 +22,9 @@ async function obtenerDatosPorProfesional() {
   const datosAnuales = procesarDatosPorProfesional(data, "anual");
 
   // Crear los gráficos
-  crearGraficoMensualPorProfesional(datosMensuales);
-  crearGraficoTrimestralPorProfesional(datosTrimestrales);
-  crearGraficoAnualPorProfesional(datosAnuales);
+  crearGraficoPorProfesional(datosMensuales, "chartMensualProfesional");
+  crearGraficoPorProfesional(datosTrimestrales, "chartTrimestralProfesional");
+  crearGraficoPorProfesional(datosAnuales, "chartAnualProfesional");
 }
 
 // Función para procesar datos por profesional y periodo
@@ -50,28 +50,16 @@ function procesarDatosPorProfesional(data, periodo) {
     }
 
     if (!resumen[key][item.profesional]) {
-      resumen[key][item.profesional] = 0;
+      resumen[key][item.profesional] = { colonoscopias: 0, gastroduodenoscopias: 0 };
     }
 
-    // Contar solo las colonoscopias
+    // Contar los procedimientos
     if (item.tipo_procedimiento === "colonoscopia") {
-      resumen[key][item.profesional]++;
+      resumen[key][item.profesional].colonoscopias++;
+    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
+      resumen[key][item.profesional].gastroduodenoscopias++;
     }
   });
-
-  // Crear etiquetas y datasets para Chart.js
-  const labels = Object.keys(resumen);
-  const profesionales = [...new Set(data.map((item) => item.profesional))];
-  const datasets = profesionales.map((profesional) => ({
-    label: profesional,
-    data: labels.map((label) => resumen[label][profesional] || 0),
-    backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(
-      Math.random() * 255
-    )}, 0.7)`, // Colores aleatorios para cada profesional
-  }));
-
-  return { labels, datasets };
-}
 
 // Función para crear gráfico mensual por profesional
 function crearGraficoMensualPorProfesional(datos) {
