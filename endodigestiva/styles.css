@@ -38,7 +38,7 @@ canvas {
 
 /* Ajustes específicos para los gráficos horizontales (mensuales) */
 .chart-horizontal .chart-container {
-  height: 500px; /* Aumenta la altura de los gráficos horizontales para mayor claridad */
+  height: 400px; /* Aumenta la altura de los gráficos horizontales para mayor claridad */
 }
 
 /* Contenedor para los gráficos apilados */
