@@ -2,9 +2,7 @@
 .chart-container {
   margin: 50px auto; /* Añade margen para separar los gráficos */
   width: 80%; /* Puedes ajustar el ancho de los gráficos */
-  max-width: 1200px; /* Limita el tamaño máximo de los gráficos */
   height: 80%; /* Ajusta la altura del gráfico */
-  max-height: 600px;
 }
 
 /* Asegúrate de que cada canvas (gráfico) ocupe el 100% del contenedor */
