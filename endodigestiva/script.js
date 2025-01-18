@@ -144,9 +144,10 @@ function crearGraficoMensual(datos) {
       ],
     },
     options: {
+      indexAxis: 'y',
       responsive: true,
       scales: {
-        x: {
+        y: {
           beginAtZero: true,
         },
       },
