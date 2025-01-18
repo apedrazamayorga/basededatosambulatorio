@@ -1,42 +1,34 @@
-/* Estilo general para el contenedor de cada gráfico */
-.chart-container {
-  margin: 50px auto; /* Añade margen para separar los gráficos */
-  width: 100%; /* Puedes ajustar el ancho de los gráficos */
-  height: 100%; /* Ajusta la altura del gráfico */
-}
-
-/* Asegúrate de que cada canvas (gráfico) ocupe el 100% del contenedor */
-canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Si usas flexbox, puedes añadir más control a la disposición */
-.chart-row {
+/* Contenedor principal para los gráficos */
+.graficos-contenedor {
   display: flex;
   flex-direction: column; /* Apila los gráficos verticalmente */
-  gap: 30px; /* Espacio entre los gráficos */
+  align-items: center;    /* Centra los gráficos horizontalmente */
+  gap: 20px;              /* Espacio entre cada gráfico */
+  padding: 20px;          /* Espaciado interno del contenedor */
+  max-width: 1200px;      /* Ancho máximo del contenedor */
+  margin: 0 auto;         /* Centra el contenedor en la página */
 }
 
-/* Estilo para los títulos */
-.chart-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
+/* Estilo para cada canvas (gráfico) */
+.grafico {
+  width: 100%;            /* Hace que los gráficos ocupen todo el ancho disponible */
+  max-width: 600px;       /* Limita el ancho máximo de cada gráfico */
+  height: 400px;          /* Establece una altura fija para los gráficos */
+  background-color: #f9f9f9; /* Fondo claro para resaltar los gráficos */
+  border: 1px solid #ccc; /* Borde sutil alrededor del gráfico */
+  border-radius: 8px;     /* Bordes redondeados */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave para un efecto elevado */
 }
 
-/* Estilo para los ejes de los gráficos */
-.chart-axis {
-  font-size: 14px;
-  font-family: 'Arial', sans-serif; /* Puedes cambiar a la fuente que prefieras */
-  color: #333;
-}
+/* Responsivo: Ajustes para pantallas más pequeñas */
+@media (max-width: 768px) {
+  .graficos-contenedor {
+    padding: 10px;       /* Reduce el espaciado en pantallas pequeñas */
+    gap: 15px;           /* Menor espacio entre gráficos */
+  }
 
-/* Estilo para la leyenda */
-.chart-legend {
-  font-size: 12px;
-  color: #555;
-  padding-top: 10px;
+  .grafico {
+    max-width: 100%;     /* Asegura que los gráficos se adapten al ancho de pantalla */
+    height: auto;        /* Ajusta la altura automáticamente */
+  }
 }
