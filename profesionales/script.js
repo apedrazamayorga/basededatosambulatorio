@@ -50,14 +50,14 @@ function procesarDatosPorProfesional(data, periodo) {
     }
 
     if (!resumen[key][item.profesional]) {
-      resumen[key][item.profesional] = { colonoscopias: 0, gastroduodenoscopias: 0 };
+      resumen[key][item.profesional] = { colonoscopia: 0, gastroduodenoscopia: 0 };
     }
 
     // Contar los procedimientos
     if (item.tipo_procedimiento === "colonoscopia") {
-      resumen[key][item.profesional].colonoscopias++;
+      resumen[key][item.profesional].colonoscopia++;
     } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
-      resumen[key][item.profesional].gastroduodenoscopias++;
+      resumen[key][item.profesional].gastroduodenoscopia++;
     }
   });
 
