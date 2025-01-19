@@ -79,6 +79,7 @@ function crearGraficoAgrupado(datos, idCanvas) {
       datasets: datos.datasets,
     },
     options: {
+      indexAxis: 'y',
       responsive: true,
       plugins: {
         legend: {
@@ -87,10 +88,11 @@ function crearGraficoAgrupado(datos, idCanvas) {
       },
       scales: {
         x: {
-          stacked: false,
+          stacked: true,
         },
         y: {
           beginAtZero: true,
+          stacked: true,
         },
       },
     },
