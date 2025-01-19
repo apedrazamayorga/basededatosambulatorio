@@ -4,28 +4,6 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Función principal para obtener datos de Supabase y generar gráficos
-async function obtenerDatosPorProfesional() {
-  const { data, error } = await supabase
-    .from("Reportes")
-    .select("fecha, tipo_procedimiento, profesional");
-
-  if (error) {
-    console.error("Error al obtener datos:", error);
-    return;
-  }
-
-  // Procesar los datos por periodo
-  const datosMensuales = procesarDatosPorProfesional(data, "mensual");
-  const datosTrimestrales = procesarDatosPorProfesional(data, "trimestral");
-  const datosAnuales = procesarDatosPorProfesional(data, "anual");
-
-  // Crear los gráficos
-  crearGraficoPorProfesional(datosMensuales, "chartMensualProfesional");
-  crearGraficoPorProfesional(datosTrimestrales, "chartTrimestralProfesional");
-  crearGraficoPorProfesional(datosAnuales, "chartAnualProfesional");
-}
-
 // Función para procesar datos por profesional y periodo
 function procesarDatosAgrupados(data, periodo) {
   const resumen = {};
@@ -97,6 +75,28 @@ function crearGraficoAgrupado(datos, idCanvas) {
       },
     },
   });
+}
+
+// Función principal para obtener datos de Supabase y generar gráficos
+async function obtenerDatosPorProfesional() {
+  const { data, error } = await supabase
+    .from("Reportes")
+    .select("fecha, tipo_procedimiento, profesional");
+
+  if (error) {
+    console.error("Error al obtener datos:", error);
+    return;
+  }
+
+  // Procesar los datos por periodo
+  const datosMensuales = procesarDatosAgrupados(data, "mensual");
+  const datosTrimestrales = procesarDatosAgrupados(data, "trimestral");
+  const datosAnuales = procesarDatosAgrupados(data, "anual");
+
+  // Crear los gráficos
+  crearGraficoAgrupado(datosMensuales, "chartMensualProfesional", "Procedimientos Mensuales por Profesional");
+  crearGraficoAgrupado(datosTrimestrales, "chartTrimestralProfesional", "Procedimientos Trimestrales por Profesional");
+  crearGraficoAgrupado(datosAnuales, "chartAnualProfesional", "Procedimientos Anuales por Profesional");
 }
 
 // Llamar a la función para iniciar el proceso
