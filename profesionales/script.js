@@ -5,6 +5,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Función para procesar datos por profesional y periodo
+// Función para procesar datos por profesional y periodo
 function procesarDatosAgrupados(data, periodo) {
   const resumen = {};
 
