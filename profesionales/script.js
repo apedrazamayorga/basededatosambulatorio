@@ -72,7 +72,7 @@ function procesarDatosAgrupados(data, periodo) {
 // Función para crear gráfico por profesional y periodo
 function crearGraficoAgrupado(datos, idCanvas) {
   const ctx = document.getElementById(idCanvas).getContext("2d");
-  new Chart(ctx, {
+  const stackedBar = new Chart(ctx, {
     type: "bar",
     data: {
       labels: datos.labels,
