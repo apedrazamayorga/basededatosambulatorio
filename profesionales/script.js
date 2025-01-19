@@ -54,9 +54,9 @@ function procesarDatosPorProfesional(data, periodo) {
 
     // Contar los procedimientos
     if (item.tipo_procedimiento === "colonoscopia") {
-      resumen[key][item.profesional].colonoscopia++;
+    resumen[key][item.profesional].colonoscopias++;
     } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
-      resumen[key][item.profesional].gastroduodenoscopia++;
+    resumen[key][item.profesional].gastroduodenoscopias++;
     }
   });
 
