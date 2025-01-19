@@ -49,50 +49,40 @@ function procesarDatosPorProfesional(data, periodo) {
     }
 
     if (!resumen[key][item.profesional]) {
-      resumen[key][item.profesional] = { colonoscopia: 0, gastroduodenoscopia: 0 };
+      resumen[key][item.profesional] = { colonoscopias: 0, gastroduodenoscopias: 0 };
     }
 
-    // Contar los procedimientos
+    // Contar los procedimientos según `tipo_procedimiento`
     if (item.tipo_procedimiento === "colonoscopia") {
-    resumen[key][item.profesional].colonoscopias++;
+      resumen[key][item.profesional].colonoscopias++;
     } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
-    resumen[key][item.profesional].gastroduodenoscopias++;
+      resumen[key][item.profesional].gastroduodenoscopias++;
     }
   });
 
-// Función para crear gráfico mensual por profesional
-function crearGraficoMensualPorProfesional(datos) {
-  const ctx = document.getElementById("chartMensualProfesional").getContext("2d");
-  const stackedBar = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: datos.labels,
-      datasets: datos.datasets,
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-        },
-      },
-      scales: {
-        x: {
-          stacked: true,
-        },
-        y: {
-          beginAtZero: true,
-          stacked: true,
-        },
-      },
-    },
-  });
+  // Crear etiquetas y datasets para Chart.js
+  const labels = Object.keys(resumen);
+  const profesionales = [...new Set(data.map((item) => item.profesional))];
+
+  const datasets = [
+    ...profesionales.map((profesional) => ({
+      label: `${profesional} - Colonoscopias`,
+      data: labels.map((label) => (resumen[label][profesional]?.colonoscopias || 0)),
+      backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 200}, ${Math.random() * 150}, 0.7)`,
+    })),
+    ...profesionales.map((profesional) => ({
+      label: `${profesional} - Gastroduodenoscopias`,
+      data: labels.map((label) => (resumen[label][profesional]?.gastroduodenoscopias || 0)),
+      backgroundColor: `rgba(${Math.random() * 200}, ${Math.random() * 255}, ${Math.random() * 150}, 0.7)`,
+    })),
+  ];
+
+  return { labels, datasets };
 }
 
-// Función para crear gráfico trimestral por profesional
-function crearGraficoTrimestralPorProfesional(datos) {
-  const ctx = document.getElementById("chartTrimestralProfesional").getContext("2d");
+// Función para crear gráfico por profesional y periodo
+function crearGraficoPorProfesional(datos, idCanvas) {
+  const ctx = document.getElementById(idCanvas).getContext("2d");
   new Chart(ctx, {
     type: "bar",
     data: {
@@ -118,32 +108,26 @@ function crearGraficoTrimestralPorProfesional(datos) {
   });
 }
 
-// Función para crear gráfico anual por profesional
-function crearGraficoAnualPorProfesional(datos) {
-  const ctx = document.getElementById("chartAnualProfesional").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: datos.labels,
-      datasets: datos.datasets,
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-        },
-      },
-      scales: {
-        x: {
-          stacked: false,
-        },
-        y: {
-          beginAtZero: true,
-        },
-      },
-    },
-  });
+// Función principal para obtener datos de Supabase y generar gráficos
+async function obtenerDatosPorProfesional() {
+  const { data, error } = await supabase
+    .from("Reportes")
+    .select("fecha, tipo_procedimiento, profesional");
+
+  if (error) {
+    console.error("Error al obtener datos:", error);
+    return;
+  }
+
+  // Procesar los datos por periodo
+  const datosMensuales = procesarDatosPorProfesional(data, "mensual");
+  const datosTrimestrales = procesarDatosPorProfesional(data, "trimestral");
+  const datosAnuales = procesarDatosPorProfesional(data, "anual");
+
+  // Crear los gráficos
+  crearGraficoPorProfesional(datosMensuales, "chartMensualProfesional");
+  crearGraficoPorProfesional(datosTrimestrales, "chartTrimestralProfesional");
+  crearGraficoPorProfesional(datosAnuales, "chartAnualProfesional");
 }
 
 // Llamar a la función para iniciar el proceso
