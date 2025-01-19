@@ -29,9 +29,9 @@ async function obtenerDatosPorProfesional() {
   const datosAnuales = procesarDatosAgrupados(data, "anual");
 
   // Crear gráficos de forma independiente
-  graficosMensual = crearGraficoAgrupado("chartMensual", datosMensuales, "Mensual");
-  graficosTrimestral = crearGraficoAgrupado("chartTrimestral", datosTrimestrales, "Trimestral");
-  graficosAnual = crearGraficoAgrupado("chartAnual", datosAnuales, "Anual");
+  graficosMensual = crearGraficoMensual("chartMensual", datosMensuales, "Mensual");
+  graficosTrimestral = crearGraficoTrimestral("chartTrimestral", datosTrimestrales, "Trimestral");
+  graficosAnual = crearGraficoAnual("chartAnual", datosAnuales, "Anual");
 
   // Crear leyendas interactivas de forma independiente
   crearLeyendaInteractiva(datosMensuales.datasets.map((ds) => ds.label), graficosMensual);
@@ -88,7 +88,55 @@ function procesarDatosAgrupados(data, periodo) {
   return { labels, datasets };
 }
 
-function crearGraficoAgrupado(canvasId, datos, titulo) {
+function crearGraficoMensual(canvasId, datos, titulo) {
+  const ctx = document.getElementById(canvasId).getContext("2d");
+  return new Chart(ctx, {
+    type: "bar",
+    data: datos,
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: titulo,
+        },
+        legend: {
+          display: false, // Desactivar la leyenda predeterminada
+        },
+      },
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, beginAtZero: true },
+      },
+    },
+  });
+}
+
+function crearGraficoTrimestral(canvasId, datos, titulo) {
+  const ctx = document.getElementById(canvasId).getContext("2d");
+  return new Chart(ctx, {
+    type: "bar",
+    data: datos,
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: titulo,
+        },
+        legend: {
+          display: false, // Desactivar la leyenda predeterminada
+        },
+      },
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, beginAtZero: true },
+      },
+    },
+  });
+}
+
+function crearGraficoAnual(canvasId, datos, titulo) {
   const ctx = document.getElementById(canvasId).getContext("2d");
   return new Chart(ctx, {
     type: "bar",
@@ -120,8 +168,8 @@ function crearLeyendaInteractiva(profesionales, grafico) {
     const boton = document.createElement("button");
     boton.textContent = profesional;
     boton.style.margin = "0 5px";
-    boton.style.padding = "2px 5px";
-    boton.style.backgroundColor = "white";
+    boton.style.padding = "5px 10px";
+    boton.style.backgroundColor = generarColorAleatorio();
     boton.style.border = "none";
     boton.style.borderRadius = "5px";
     boton.style.color = "white";
@@ -147,4 +195,3 @@ function generarColorAleatorio() {
 
 // Llamar a la función principal
 obtenerDatosPorProfesional();
-
