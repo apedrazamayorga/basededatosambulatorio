@@ -108,27 +108,5 @@ function crearGraficoPorProfesional(datos, idCanvas) {
   });
 }
 
-// Función principal para obtener datos de Supabase y generar gráficos
-async function obtenerDatosPorProfesional() {
-  const { data, error } = await supabase
-    .from("Reportes")
-    .select("fecha, tipo_procedimiento, profesional");
-
-  if (error) {
-    console.error("Error al obtener datos:", error);
-    return;
-  }
-
-  // Procesar los datos por periodo
-  const datosMensuales = procesarDatosPorProfesional(data, "mensual");
-  const datosTrimestrales = procesarDatosPorProfesional(data, "trimestral");
-  const datosAnuales = procesarDatosPorProfesional(data, "anual");
-
-  // Crear los gráficos
-  crearGraficoPorProfesional(datosMensuales, "chartMensualProfesional");
-  crearGraficoPorProfesional(datosTrimestrales, "chartTrimestralProfesional");
-  crearGraficoPorProfesional(datosAnuales, "chartAnualProfesional");
-}
-
 // Llamar a la función para iniciar el proceso
 obtenerDatosPorProfesional();
