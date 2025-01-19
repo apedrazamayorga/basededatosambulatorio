@@ -27,7 +27,7 @@ async function obtenerDatosPorProfesional() {
 }
 
 // Función para procesar datos por profesional y periodo
-function procesarDatosPorProfesional(data, periodo) {
+function procesarDatosAgrupados(data, periodo) {
   const resumen = {};
 
   data.forEach((item) => {
@@ -49,39 +49,28 @@ function procesarDatosPorProfesional(data, periodo) {
     }
 
     if (!resumen[key][item.profesional]) {
-      resumen[key][item.profesional] = { colonoscopias: 0, gastroduodenoscopias: 0 };
+      resumen[key][item.profesional] = 0;
     }
 
-    // Contar los procedimientos según `tipo_procedimiento`
-    if (item.tipo_procedimiento === "colonoscopia") {
-      resumen[key][item.profesional].colonoscopias++;
-    } else if (item.tipo_procedimiento === "gastroduodenoscopia") {
-      resumen[key][item.profesional].gastroduodenoscopias++;
-    }
+    // Sumar ambos tipos de procedimientos
+    resumen[key][item.profesional]++;
   });
 
   // Crear etiquetas y datasets para Chart.js
   const labels = Object.keys(resumen);
   const profesionales = [...new Set(data.map((item) => item.profesional))];
 
-  const datasets = [
-    ...profesionales.map((profesional) => ({
-      label: `${profesional} - Colonoscopias`,
-      data: labels.map((label) => (resumen[label][profesional]?.colonoscopias || 0)),
-      backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 200}, ${Math.random() * 150}, 0.7)`,
-    })),
-    ...profesionales.map((profesional) => ({
-      label: `${profesional} - Gastroduodenoscopias`,
-      data: labels.map((label) => (resumen[label][profesional]?.gastroduodenoscopias || 0)),
-      backgroundColor: `rgba(${Math.random() * 200}, ${Math.random() * 255}, ${Math.random() * 150}, 0.7)`,
-    })),
-  ];
+  const datasets = profesionales.map((profesional) => ({
+    label: profesional,
+    data: labels.map((label) => (resumen[label][profesional] || 0)),
+    backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 200}, ${Math.random() * 150}, 0.7)`,
+  }));
 
   return { labels, datasets };
 }
 
 // Función para crear gráfico por profesional y periodo
-function crearGraficoPorProfesional(datos, idCanvas) {
+function crearGraficoAgrupado(datos, idCanvas) {
   const ctx = document.getElementById(idCanvas).getContext("2d");
   new Chart(ctx, {
     type: "bar",
