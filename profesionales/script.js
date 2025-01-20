@@ -81,14 +81,14 @@ function crearGraficoCompuesto(datos) {
       },
       scales: {
         x: {
-          stacked: false,
+          stacked: true,
           title: {
             display: true,
             text: "Meses",
           },
         },
         y: {
-          stacked: false,
+          stacked: true,
           beginAtZero: true,
           title: {
             display: true,
