@@ -67,7 +67,7 @@ function crearGraficoCompuesto(datos) {
     type: "bar",
     data: datos,
     options: {
-      indexAxis: 'y'.
+      indexAxis: 'y',
       responsive: true,
       plugins: {
         title: {
