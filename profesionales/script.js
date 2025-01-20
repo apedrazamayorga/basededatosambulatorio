@@ -140,3 +140,4 @@ function generarColorAleatorio() {
 
 // Llamar a la función principal
 obtenerDatosPorMes();
+
