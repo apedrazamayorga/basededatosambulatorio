@@ -4,12 +4,7 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Almacenar las referencias de los gráficos
-let graficosMensual = null;
-let graficosTrimestral = null;
-let graficosAnual = null;
-
-async function obtenerDatosPorProfesional() {
+async function obtenerDatosPorMes() {
   const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento, profesional");
 
   if (error) {
@@ -24,195 +19,116 @@ async function obtenerDatosPorProfesional() {
 
   console.log("Datos recibidos:", data);
 
-  const datosMensuales = procesarDatosAgrupados(data, "mensual");
-  const datosTrimestrales = procesarDatosAgrupados(data, "trimestral");
-  const datosAnuales = procesarDatosAgrupados(data, "anual");
-
-  // Crear gráficos de forma independiente
-  graficosMensual = crearGraficoMensual("chartMensual", datosMensuales, "Mensual");
-  graficosTrimestral = crearGraficoTrimestral("chartTrimestral", datosTrimestrales, "Trimestral");
-  graficosAnual = crearGraficoAnual("chartAnual", datosAnuales, "Anual");
-
-  // Crear leyendas interactivas de forma independiente
-  crearLeyendaInteractiva(datosMensuales.datasets.map((ds) => ds.label), graficosMensual);
-  crearLeyendaInteractiva(datosTrimestrales.datasets.map((ds) => ds.label), graficosTrimestral);
-  crearLeyendaInteractiva(datosAnuales.datasets.map((ds) => ds.label), graficosAnual);
+  const datosPorMes = procesarDatosPorMes(data);
+  crearPestañas(datosPorMes);
 }
 
-function procesarDatosAgrupados(data, periodo) {
-  const resumen = {};
+function procesarDatosPorMes(data) {
+  const resumenMensual = {};
 
   data.forEach((item) => {
     const fecha = new Date(item.fecha);
-    let clavePeriodo;
-
-    if (periodo === "mensual") {
-      clavePeriodo = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
-    } else if (periodo === "trimestral") {
-      const trimestre = Math.floor(fecha.getMonth() / 3) + 1;
-      clavePeriodo = `${fecha.getFullYear()}-T${trimestre}`;
-    } else if (periodo === "anual") {
-      clavePeriodo = `${fecha.getFullYear()}`;
-    }
+    const mes = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
 
     const profesional = item.profesional || "Desconocido";
 
-    if (!resumen[clavePeriodo]) {
-      resumen[clavePeriodo] = {};
+    if (!resumenMensual[mes]) {
+      resumenMensual[mes] = {};
     }
-    if (!resumen[clavePeriodo][profesional]) {
-      resumen[clavePeriodo][profesional] = 0;
+
+    if (!resumenMensual[mes][profesional]) {
+      resumenMensual[mes][profesional] = 0;
     }
 
     if (["colonoscopia", "gastroduodenoscopia"].includes(item.tipo_procedimiento)) {
-      resumen[clavePeriodo][profesional]++;
+      resumenMensual[mes][profesional]++;
     }
   });
 
-  const labels = Object.keys(resumen).sort((a, b) => {
-    const dateA = new Date(a.replace(/-T\d/, ""));
-    const dateB = new Date(b.replace(/-T\d/, ""));
-    return dateA - dateB;
-  });
-
-  const profesionales = Array.from(
-    new Set(data.map((item) => item.profesional || "Desconocido"))
-  );
-
-  const datasets = profesionales.map((profesional) => ({
-    label: profesional,
-    data: labels.map((periodo) => resumen[periodo]?.[profesional] || 0),
-    backgroundColor: generarColorAleatorio(),
-  }));
-
-  return { labels, datasets };
+  return resumenMensual;
 }
 
-function crearGraficoMensual(canvasId, datos, titulo) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
-  return new Chart(ctx, {
-    type: "bar",
-    data: datos,
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: titulo,
-        },
-        legend: {
-          display: false, // Desactivar la leyenda predeterminada
-        },
-      },
-      scales: {
-        x: { stacked: true },
-        y: { stacked: true, beginAtZero: true },
-      },
-    },
-  });
-}
+function crearPestañas(datosPorMes) {
+  const pestañas = document.getElementById("pestañas");
+  pestañas.innerHTML = ""; // Limpiar pestañas previas
 
-function crearGraficoTrimestral(canvasId, datos, titulo) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
-  return new Chart(ctx, {
-    type: "bar",
-    data: datos,
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: titulo,
-        },
-        legend: {
-          display: false, // Desactivar la leyenda predeterminada
-        },
-      },
-      scales: {
-        x: { stacked: true },
-        y: { stacked: true, beginAtZero: true },
-      },
-    },
-  });
-}
+  const meses = Object.keys(datosPorMes).sort((a, b) => new Date(a) - new Date(b));
 
-function crearGraficoAnual(canvasId, datos, titulo) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
-  return new Chart(ctx, {
-    type: "doughnut",
-    data: datos,
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: titulo,
-        },
-        legend: {
-          display: false, // Desactivar la leyenda predeterminada
-        },
-      },
-      scales: {
-        x: { stacked: false },
-        y: { stacked: false, beginAtZero: true },
-      },
-    },
-  });
-}
-
-function crearLeyendaInteractiva(profesionales, grafico) {
-  const leyenda = document.getElementById("leyenda");
-  leyenda.innerHTML = ""; // Limpiar leyenda previa
-
-  // Crear contenedor de estilo para la leyenda
-  const contenedor = document.createElement("div");
-  contenedor.style.display = "grid";
-  contenedor.style.gridTemplateColumns = "1fr 1fr"; // Dos columnas
-  contenedor.style.gap = "10px"; // Espaciado entre filas
-
-  // Botón para "Ver todos"
-  const botonVerTodos = document.createElement("button");
-  botonVerTodos.textContent = "Ver todos";
-  botonVerTodos.style.margin = "5px 0";
-  botonVerTodos.style.padding = "5px 10px";
-  botonVerTodos.style.border = "1px solid #000";
-  botonVerTodos.style.borderRadius = "5px";
-  botonVerTodos.style.backgroundColor = "#fff";
-  botonVerTodos.style.cursor = "pointer";
-  botonVerTodos.style.justifySelf = "left"; // Justificar a la izquierda
-
-  botonVerTodos.addEventListener("click", () => {
-    grafico.data.datasets.forEach((dataset) => {
-      dataset.hidden = false; // Mostrar todos los datos
-    });
-    grafico.update();
-  });
-
-  leyenda.appendChild(botonVerTodos); // Agregar botón "Ver todos"
-
-  // Crear botones para cada profesional
-  profesionales.forEach((profesional) => {
+  // Crear botón para cada mes
+  meses.forEach((mes, index) => {
     const boton = document.createElement("button");
-    boton.textContent = profesional;
-    boton.style.margin = "5px 0";
+    boton.textContent = mes;
+    boton.style.margin = "5px";
     boton.style.padding = "5px 10px";
     boton.style.border = "1px solid #000";
     boton.style.borderRadius = "5px";
-    boton.style.backgroundColor = "#fff";
+    boton.style.backgroundColor = index === 0 ? "#000" : "#fff"; // Resaltar el primero
+    boton.style.color = index === 0 ? "#fff" : "#000";
     boton.style.cursor = "pointer";
-    boton.style.justifySelf = "left"; // Justificar a la izquierda
 
     boton.addEventListener("click", () => {
-      grafico.data.datasets.forEach((dataset) => {
-        dataset.hidden = dataset.label !== profesional; // Mostrar solo el profesional seleccionado
-      });
-      grafico.update();
+      actualizarGrafico(datosPorMes[mes], mes);
+      resaltarPestaña(boton, pestañas);
     });
 
-    contenedor.appendChild(boton); // Agregar botón al contenedor
+    pestañas.appendChild(boton);
   });
 
-  leyenda.appendChild(contenedor); // Agregar contenedor a la leyenda
+  // Mostrar datos del primer mes por defecto
+  actualizarGrafico(datosPorMes[meses[0]], meses[0]);
+}
+
+function resaltarPestaña(botonSeleccionado, contenedor) {
+  const botones = contenedor.querySelectorAll("button");
+  botones.forEach((boton) => {
+    boton.style.backgroundColor = "#fff";
+    boton.style.color = "#000";
+  });
+  botonSeleccionado.style.backgroundColor = "#000";
+  botonSeleccionado.style.color = "#fff";
+}
+
+function actualizarGrafico(datosMes, mes) {
+  const labels = Object.keys(datosMes);
+  const data = Object.values(datosMes);
+
+  const datos = {
+    labels,
+    datasets: [
+      {
+        label: `Procedimientos en ${mes}`,
+        data,
+        backgroundColor: generarColorAleatorio(),
+      },
+    ],
+  };
+
+  if (window.graficoPorProfesional) {
+    window.graficoPorProfesional.data = datos;
+    window.graficoPorProfesional.update();
+  } else {
+    const ctx = document.getElementById("chartPorProfesional").getContext("2d");
+    window.graficoPorProfesional = new Chart(ctx, {
+      type: "bar",
+      data: datos,
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Procedimientos por Profesional",
+          },
+          legend: {
+            display: true,
+          },
+        },
+        scales: {
+          x: { beginAtZero: true },
+          y: { beginAtZero: true },
+        },
+      },
+    });
+  }
 }
 
 function generarColorAleatorio() {
@@ -223,4 +139,4 @@ function generarColorAleatorio() {
 }
 
 // Llamar a la función principal
-obtenerDatosPorProfesional();
+obtenerDatosPorMes();
