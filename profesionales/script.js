@@ -112,6 +112,7 @@ function actualizarGrafico(datosMes, mes) {
       type: "bar",
       data: datos,
       options: {
+        indexAxis: 'y',
         responsive: true,
         plugins: {
           title: {
