@@ -153,8 +153,8 @@ function crearGraficoAnual(canvasId, datos, titulo) {
         },
       },
       scales: {
-        x: { stacked: true },
-        y: { stacked: true, beginAtZero: true },
+        x: { stacked: false },
+        y: { stacked: false, beginAtZero: true },
       },
     },
   });
