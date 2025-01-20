@@ -164,16 +164,43 @@ function crearLeyendaInteractiva(profesionales, grafico) {
   const leyenda = document.getElementById("leyenda");
   leyenda.innerHTML = ""; // Limpiar leyenda previa
 
+  // Crear contenedor de estilo para la leyenda
+  const contenedor = document.createElement("div");
+  contenedor.style.display = "grid";
+  contenedor.style.gridTemplateColumns = "1fr 1fr"; // Dos columnas
+  contenedor.style.gap = "10px"; // Espaciado entre filas
+
+  // Botón para "Ver todos"
+  const botonVerTodos = document.createElement("button");
+  botonVerTodos.textContent = "Ver todos";
+  botonVerTodos.style.margin = "5px 0";
+  botonVerTodos.style.padding = "5px 10px";
+  botonVerTodos.style.border = "1px solid #000";
+  botonVerTodos.style.borderRadius = "5px";
+  botonVerTodos.style.backgroundColor = "#fff";
+  botonVerTodos.style.cursor = "pointer";
+  botonVerTodos.style.justifySelf = "left"; // Justificar a la izquierda
+
+  botonVerTodos.addEventListener("click", () => {
+    grafico.data.datasets.forEach((dataset) => {
+      dataset.hidden = false; // Mostrar todos los datos
+    });
+    grafico.update();
+  });
+
+  leyenda.appendChild(botonVerTodos); // Agregar botón "Ver todos"
+
+  // Crear botones para cada profesional
   profesionales.forEach((profesional) => {
     const boton = document.createElement("button");
     boton.textContent = profesional;
-    boton.style.margin = "0 5px";
+    boton.style.margin = "5px 0";
     boton.style.padding = "5px 10px";
-    boton.style.backgroundColor = generarColorAleatorio();
-    boton.style.border = "none";
+    boton.style.border = "1px solid #000";
     boton.style.borderRadius = "5px";
-    boton.style.color = "white";
+    boton.style.backgroundColor = "#fff";
     boton.style.cursor = "pointer";
+    boton.style.justifySelf = "left"; // Justificar a la izquierda
 
     boton.addEventListener("click", () => {
       grafico.data.datasets.forEach((dataset) => {
@@ -182,8 +209,10 @@ function crearLeyendaInteractiva(profesionales, grafico) {
       grafico.update();
     });
 
-    leyenda.appendChild(boton);
+    contenedor.appendChild(boton); // Agregar botón al contenedor
   });
+
+  leyenda.appendChild(contenedor); // Agregar contenedor a la leyenda
 }
 
 function generarColorAleatorio() {
