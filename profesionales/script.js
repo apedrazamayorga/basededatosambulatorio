@@ -139,7 +139,7 @@ function crearGraficoTrimestral(canvasId, datos, titulo) {
 function crearGraficoAnual(canvasId, datos, titulo) {
   const ctx = document.getElementById(canvasId).getContext("2d");
   return new Chart(ctx, {
-    type: "bar",
+    type: "doughnut",
     data: datos,
     options: {
       responsive: true,
