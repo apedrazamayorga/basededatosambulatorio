@@ -4,7 +4,7 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function obtenerDatosPorMes() {
+async function obtenerDatosCompuestos() {
   const { data, error } = await supabase.from("Reportes").select("fecha, tipo_procedimiento, profesional");
 
   if (error) {
@@ -19,11 +19,11 @@ async function obtenerDatosPorMes() {
 
   console.log("Datos recibidos:", data);
 
-  const datosPorMes = procesarDatosPorMes(data);
-  crearPestañas(datosPorMes);
+  const datosCompuestos = procesarDatosCompuestos(data);
+  crearGraficoCompuesto(datosCompuestos);
 }
 
-function procesarDatosPorMes(data) {
+function procesarDatosCompuestos(data) {
   const resumenMensual = {};
 
   data.forEach((item) => {
@@ -45,91 +45,59 @@ function procesarDatosPorMes(data) {
     }
   });
 
-  return resumenMensual;
+  const labels = Object.keys(resumenMensual).sort((a, b) => new Date(a) - new Date(b));
+
+  const profesionales = Array.from(
+    new Set(data.map((item) => item.profesional || "Desconocido"))
+  );
+
+  const datasets = profesionales.map((profesional) => ({
+    label: profesional,
+    data: labels.map((mes) => resumenMensual[mes]?.[profesional] || 0),
+    backgroundColor: generarColorAleatorio(),
+  }));
+
+  return { labels, datasets };
 }
 
-function crearPestañas(datosPorMes) {
-  const pestañas = document.getElementById("pestañas");
-  pestañas.innerHTML = ""; // Limpiar pestañas previas
+function crearGraficoCompuesto(datos) {
+  const ctx = document.getElementById("chartPorProfesional").getContext("2d");
 
-  const meses = Object.keys(datosPorMes).sort((a, b) => new Date(a) - new Date(b));
-
-  // Crear botón para cada mes
-  meses.forEach((mes, index) => {
-    const boton = document.createElement("button");
-    boton.textContent = mes;
-    boton.style.margin = "5px";
-    boton.style.padding = "5px 10px";
-    boton.style.border = "1px solid #000";
-    boton.style.borderRadius = "5px";
-    boton.style.backgroundColor = index === 0 ? "#000" : "#fff"; // Resaltar el primero
-    boton.style.color = index === 0 ? "#fff" : "#000";
-    boton.style.cursor = "pointer";
-
-    boton.addEventListener("click", () => {
-      actualizarGrafico(datosPorMes[mes], mes);
-      resaltarPestaña(boton, pestañas);
-    });
-
-    pestañas.appendChild(boton);
-  });
-
-  // Mostrar datos del primer mes por defecto
-  actualizarGrafico(datosPorMes[meses[0]], meses[0]);
-}
-
-function resaltarPestaña(botonSeleccionado, contenedor) {
-  const botones = contenedor.querySelectorAll("button");
-  botones.forEach((boton) => {
-    boton.style.backgroundColor = "#fff";
-    boton.style.color = "#000";
-  });
-  botonSeleccionado.style.backgroundColor = "#000";
-  botonSeleccionado.style.color = "#fff";
-}
-
-function actualizarGrafico(datosMes, mes) {
-  const labels = Object.keys(datosMes);
-  const data = Object.values(datosMes);
-
-  const datos = {
-    labels,
-    datasets: [
-      {
-        label: `Procedimientos en ${mes}`,
-        data,
-        backgroundColor: generarColorAleatorio(),
+  new Chart(ctx, {
+    type: "bar",
+    data: datos,
+    options: {
+      indexAxis: 'y'.
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: "Número de Procedimientos por Profesional",
+        },
+        legend: {
+          display: true,
+          position: "top",
+        },
       },
-    ],
-  };
-
-  if (window.graficoPorProfesional) {
-    window.graficoPorProfesional.data = datos;
-    window.graficoPorProfesional.update();
-  } else {
-    const ctx = document.getElementById("chartPorProfesional").getContext("2d");
-    window.graficoPorProfesional = new Chart(ctx, {
-      type: "bar",
-      data: datos,
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
+      scales: {
+        x: {
+          stacked: false,
           title: {
             display: true,
-            text: "Procedimientos por Profesional",
-          },
-          legend: {
-            display: true,
+            text: "Meses",
           },
         },
-        scales: {
-          x: { beginAtZero: true },
-          y: { beginAtZero: true },
+        y: {
+          stacked: false,
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Cantidad de Procedimientos",
+          },
         },
       },
-    });
-  }
+    },
+  });
 }
 
 function generarColorAleatorio() {
@@ -140,5 +108,4 @@ function generarColorAleatorio() {
 }
 
 // Llamar a la función principal
-obtenerDatosPorMes();
-
+obtenerDatosCompuestos();
