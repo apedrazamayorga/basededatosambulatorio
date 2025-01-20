@@ -63,7 +63,7 @@ function procesarDatosCompuestos(data) {
 function crearGraficoCompuesto(datos) {
   const ctx = document.getElementById("chartPorProfesional").getContext("2d");
 
-  new Chart(ctx, {
+  const stackedBar = new Chart(ctx, {
     type: "bar",
     data: datos,
     options: {
