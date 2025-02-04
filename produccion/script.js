@@ -7,7 +7,7 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function obtenerDatos() {
     // Consulta a la base de datos
     const { data, error } = await supabase
-        .from('nombre_de_tu_tabla')
+        .from('produccion')
         .select('*');
 
     if (error) {
