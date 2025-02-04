@@ -5,27 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gráfico de Procedimientos</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
     <h1>Número de Procedimientos por Semana</h1>
     <canvas id="myChart" width="800" height="400"></canvas>
-
-    <script>
-        // Datos obtenidos desde data.js
-        const semanas = window.semanas;
-        const gastroduodenoscopia = window.gastroduodenoscopia;
-        const colonoscopia = window.colonoscopia;
-
-        // Configuración del gráfico
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: semanas,
-                datasets: [
-                    {
-                        label: 'GASTRODUODENOSCOPIA CDAV',
-                        data: gastroduodenoscopia,
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255,
+</body>
+</html>
