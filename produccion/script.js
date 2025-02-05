@@ -15,16 +15,10 @@ function parseFecha(fechaStr) {
         return null;
     }
 
-    // Eliminar espacios en blanco y caracteres no imprimibles
-    fechaStr = fechaStr.trim().replace(/\s+/g, '');
+    fechaStr = fechaStr.trim();
+    const meses = { 'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
+                    'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11 };
 
-    // Diccionario de meses en español
-    const meses = {
-        'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11
-    };
-
-    // Verificar si tiene el formato correcto 'DD-MMM-YYYY'
     const regexFecha = /^(\d{2})-([a-zA-Z]{3})-(\d{4})$/;
     const match = fechaStr.match(regexFecha);
 
@@ -63,38 +57,54 @@ async function obtenerDatos() {
     
     console.log("Datos obtenidos de Supabase:", data);
 
-    // Procesar los datos
     const df = data.map(row => ({
         fecha: parseFecha(row["Fecha del procedimiento programado"]),
         procedimiento: row["nombre del procedimiento"]
     })).filter(row => row.fecha !== null); // Filtrar fechas nulas
 
-    console.log("Lista de procedimientos:", df.map(r => r.procedimiento));
+    console.log("Datos después de conversión de fechas:", df);
 
     // Filtrar los procedimientos relevantes
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
 
+    console.log("Datos filtrados (solo procedimientos de interés):", dfFiltrado);
+
+    if (dfFiltrado.length === 0) {
+        console.warn("No hay datos para los procedimientos seleccionados.");
+        return;
+    }
+
     // Agrupar por semana y nombre del procedimiento
     const datosAgrupados = dfFiltrado.reduce((acc, row) => {
         const semana = getWeek(row.fecha);
-        console.log("Semana calculada para", row.fecha, ":", semana);
-        const procedimiento = row.procedimiento;
-
+        console.log(`Fecha: ${row.fecha} -> Semana: ${semana}`);
+        
         if (!acc[semana]) {
             acc[semana] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
         }
 
-        acc[semana][procedimiento] += 1;
+        acc[semana][row.procedimiento] += 1;
         return acc;
     }, {});
 
+    console.log("Datos agrupados por semana:", datosAgrupados);
+
     // Convertir a arrays para Chart.js
     const semanas = Object.keys(datosAgrupados).sort((a, b) => a - b);
-    const gastroduodenoscopia = semanas.map(semana => datosAgrupados[semana]['GASTRODUODENOSCOPIA CDAV']);
-    const colonoscopia = semanas.map(semana => datosAgrupados[semana]['COLONOSCOPIA CDAV']);
+    const gastroduodenoscopia = semanas.map(semana => datosAgrupados[semana]['GASTRODUODENOSCOPIA CDAV'] || 0);
+    const colonoscopia = semanas.map(semana => datosAgrupados[semana]['COLONOSCOPIA CDAV'] || 0);
+
+    console.log("Semanas:", semanas);
+    console.log("Datos GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
+    console.log("Datos COLONOSCOPIA CDAV:", colonoscopia);
 
     // Graficar los datos
+    if (semanas.length === 0) {
+        console.warn("No hay datos para graficar.");
+        return;
+    }
+
     graficarDatos(semanas, gastroduodenoscopia, colonoscopia);
 }
 
@@ -105,56 +115,4 @@ function getWeek(date) {
     return Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
 }
 
-// Función para graficar los datos con Chart.js
-function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
-    const ctx = document.getElementById('myChart').getContext('2d');
-
-    // Destruir el gráfico anterior si existe
-    if (myChart) {
-        myChart.destroy();
-    }
-
-    myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: semanas,
-            datasets: [
-                {
-                    label: 'GASTRODUODENOSCOPIA CDAV',
-                    data: gastroduodenoscopia,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2
-                },
-                {
-                    label: 'COLONOSCOPIA CDAV',
-                    data: colonoscopia,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Semana del Año'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Número de Procedimientos'
-                    },
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-}
-
-// Iniciar la obtención de datos al cargar la página
-document.addEventListener('DOMContentLoaded', obtenerDatos);
-
+// Función para graficar 
