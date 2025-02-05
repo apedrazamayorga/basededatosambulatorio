@@ -7,6 +7,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let myChart = null; // Para evitar superposiciones de gráficos
+let datosPorSemana = {}; // Almacenará los datos agrupados por semana
 
 // Función para convertir fechas de 'DD-MMM-YYYY' a Date
 function parseFecha(fechaStr) {
@@ -32,9 +33,52 @@ async function obtenerDatos() {
 
     if (df.length === 0) return;
 
+    // Agrupar por semana
+    datosPorSemana = {};
+    df.forEach(row => {
+        const semana = obtenerSemanaDelAño(row.fecha);
+        if (!datosPorSemana[semana]) datosPorSemana[semana] = [];
+        datosPorSemana[semana].push(row);
+    });
+
+    // Generar lista de semanas en el selector
+    actualizarSelectorSemanas(Object.keys(datosPorSemana).sort((a, b) => a - b));
+
+    // Graficar la primera semana por defecto
+    graficarSemana(Object.keys(datosPorSemana)[0]);
+}
+
+// Función para obtener la semana del año
+function obtenerSemanaDelAño(fecha) {
+    const primerDiaDelAño = new Date(fecha.getFullYear(), 0, 1);
+    const diasPasados = Math.floor((fecha - primerDiaDelAño) / (24 * 60 * 60 * 1000));
+    return Math.ceil((diasPasados + primerDiaDelAño.getDay() + 1) / 7);
+}
+
+// Función para actualizar el selector de semanas
+function actualizarSelectorSemanas(semanas) {
+    const selector = document.getElementById("selectorSemana");
+    selector.innerHTML = "";
+    semanas.forEach(semana => {
+        const opcion = document.createElement("option");
+        opcion.value = semana;
+        opcion.textContent = `Semana ${semana}`;
+        selector.appendChild(opcion);
+    });
+
+    // Evento para cambiar de semana
+    selector.addEventListener("change", (e) => graficarSemana(e.target.value));
+}
+
+// Función para graficar una semana específica
+function graficarSemana(semana) {
+    if (!datosPorSemana[semana]) return;
+
+    const dfFiltrado = datosPorSemana[semana];
+
     // Agrupar por sala y procedimiento
     const datosAgrupados = {};
-    df.forEach(row => {
+    dfFiltrado.forEach(row => {
         if (!datosAgrupados[row.sala]) {
             datosAgrupados[row.sala] = {};
         }
@@ -44,48 +88,4 @@ async function obtenerDatos() {
         datosAgrupados[row.sala][row.procedimiento] += 1;
     });
 
-    const salas = Object.keys(datosAgrupados);
-    const procedimientosUnicos = [...new Set(df.map(row => row.procedimiento))];
-
-    // Crear datasets para cada procedimiento
-    const datasets = procedimientosUnicos.map(procedimiento => ({
-        label: procedimiento,
-        data: salas.map(sala => datosAgrupados[sala][procedimiento] || 0),
-        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`,
-        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
-        borderWidth: 1,
-    }));
-
-    graficarDatos(salas, datasets);
-}
-
-// Función para graficar los datos
-function graficarDatos(salas, datasets) {
-    const ctx = document.getElementById('myChart')?.getContext('2d');
-    if (!ctx) return;
-
-    if (myChart) myChart.destroy();
-
-    myChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: salas,
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, ticks: { color: "black" } },
-                x: { ticks: { color: "black" } },
-            },
-            plugins: {
-                legend: { labels: { color: "black", font: { family: "Arial", size: 14 } } },
-            },
-        },
-    });
-}
-
-// Ejecutar la función cuando el DOM esté cargado
-document.addEventListener("DOMContentLoaded", () => obtenerDatos());
-
+    const salas = Object.keys(d
