@@ -142,7 +142,7 @@ function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
         options: {
             scales: {
                 x: { stacked: true, title: { display: true, text: 'Semana del Año' } },
-                y: { stacjed: true, title: { display: true, text: 'Número de Procedimientos' }, beginAtZero: true }
+                y: { title: { display: true, text: 'Número de Procedimientos' }, beginAtZero: true }
             }
         }
     });
