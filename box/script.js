@@ -8,60 +8,95 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let myChart = null; // Para evitar superposiciones de gráficos
 
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM completamente cargado.");
+    obtenerDatos();
+});
+
 // Función para convertir fechas de 'DD-MMM-YYYY' a un objeto Date
 function parseFecha(fechaStr) {
-    if (!fechaStr || typeof fechaStr !== "string") return null;
+    if (!fechaStr || typeof fechaStr !== "string") {
+        console.warn("Fecha no válida (vacía o nula):", fechaStr);
+        return null;
+    }
     
-    fechaStr = fechaStr.trim().toLowerCase();
-    const meses = { 'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11 };
+    const meses = { 
+        'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11 
+    };
+
+    const regexFecha = /^\d{2}-[a-z]{3}-\d{4}$/;
+    if (!regexFecha.test(fechaStr.toLowerCase())) {
+        console.warn("Formato de fecha incorrecto:", fechaStr);
+        return null;
+    }
+
+    const [dia, mesTexto, año] = fechaStr.split("-");
+    const mesIndex = meses[mesTexto.toLowerCase()];
     
-    const match = fechaStr.match(/^(\d{2})-([a-z]{3})-(\d{4})$/);
-    if (!match) return null;
+    if (mesIndex === undefined) {
+        console.warn("Mes no reconocido:", mesTexto);
+        return null;
+    }
     
-    const [, dia, mesTexto, año] = match;
-    const mesIndex = meses[mesTexto];
-    if (mesIndex === undefined) return null;
-    
-    return new Date(parseInt(año, 10), mesIndex, parseInt(dia, 10));
+    const fecha = new Date(parseInt(año, 10), mesIndex, parseInt(dia, 10));
+    return isNaN(fecha.getTime()) ? null : fecha;
 }
 
 // Función para obtener y procesar los datos
-tasync function obtenerDatos() {
+async function obtenerDatos() {
     const { data, error } = await supabase.from('produccion').select('*');
-    if (error || !data || data.length === 0) return;
-
+    
+    if (error) {
+        console.error('Error al obtener los datos:', error);
+        return;
+    }
+    
+    if (!data || data.length === 0) {
+        console.warn("No se recibieron datos desde Supabase.");
+        return;
+    }
+    
+    console.log("Datos obtenidos de Supabase:", data);
+    
     const df = data.map(row => ({
-        fecha: parseFecha(row["Fecha del procedimiento programado"]?.trim() || row["fecha del procedimiento programado"]?.trim()),
-        procedimiento: row["Nombre del procedimiento"]?.trim() || row["nombre del procedimiento"]?.trim(),
+        fecha: parseFecha(row["Fecha del procedimiento programado"]?.trim()),
+        procedimiento: row["Nombre del procedimiento"]?.trim(),
         sala: row["Sala de adquisición"]?.trim()
-    })).filter(row => row.fecha !== null && row.procedimiento && row.sala);
-
+    })).filter(row => row.fecha && row.procedimiento && row.sala);
+    
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
-    if (dfFiltrado.length === 0) return;
-
+    
+    if (dfFiltrado.length === 0) {
+        console.warn("No hay datos para los procedimientos seleccionados.");
+        return;
+    }
+    
     const datosAgrupados = dfFiltrado.reduce((acc, row) => {
         if (!acc[row.sala]) acc[row.sala] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
         acc[row.sala][row.procedimiento]++;
         return acc;
     }, {});
-
+    
     const salas = Object.keys(datosAgrupados);
     const gastroduodenoscopia = salas.map(sala => datosAgrupados[sala]['GASTRODUODENOSCOPIA CDAV'] || 0);
     const colonoscopia = salas.map(sala => datosAgrupados[sala]['COLONOSCOPIA CDAV'] || 0);
-
+    
     graficarDatos(salas, gastroduodenoscopia, colonoscopia);
 }
 
 // Función para graficar los datos
 function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
     const canvas = document.getElementById("myChart");
-    if (!canvas) return;
-
+    if (!canvas) {
+        console.error("❌ No se encontró el canvas con ID 'myChart'.");
+        return;
+    }
     const ctx = canvas.getContext("2d");
+    
     if (myChart) myChart.destroy();
-
+    
     myChart = new Chart(ctx, {
         type: "bar",
         data: {
@@ -106,6 +141,3 @@ function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
         },
     });
 }
-
-document.addEventListener("DOMContentLoaded", obtenerDatos);
-
