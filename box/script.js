@@ -27,8 +27,8 @@ function parseFecha(fechaStr) {
         return null;
     }
 
-    const [, dia, mes, año] = match;
-    const mesIndex = meses[mes.toLowerCase()];
+    const [, dia, mesTexto, año] = match;
+    const mesIndex = meses[mesTexto.toLowerCase()];
 
     if (mesIndex === undefined) {
         console.warn("Mes no reconocido en la fecha:", fechaStr);
