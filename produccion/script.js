@@ -21,32 +21,37 @@ async function obtenerDatos() {
 
     // Procesar los datos
     const df = data.map(row => {
-        const fechaStr = row["fecha del procedimiento programado"];
-        const fecha = fechaStr ? new Date(fechaStr) : null;
+        const fecha = new Date(row["fecha del procedimiento programado"]);
+        console.log("Fecha procesada:", fecha);
         return {
-            fecha,
+            fecha: fecha,
             procedimiento: row["nombre del procedimiento"]
         };
-    }).filter(row => row.fecha); // Filtra valores sin fecha válida
+    });
 
-    console.log("Lista de procedimientos:", df);
+    console.log("Lista de procedimientos:", df.map(r => r.procedimiento));
 
     // Filtrar los procedimientos relevantes
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
 
-    console.log("Datos filtrados:", dfFiltrado);
+    // Si no hay datos filtrados, muestra un mensaje y termina
+    if (dfFiltrado.length === 0) {
+        console.error("No se encontraron procedimientos relevantes.");
+        return;
+    }
 
     // Agrupar por semana y nombre del procedimiento
     const datosAgrupados = dfFiltrado.reduce((acc, row) => {
         const semana = getWeek(row.fecha);
-        console.log(`Semana ${semana} para ${row.fecha.toISOString()}`);
+        console.log("Semana calculada para", row.fecha, ":", semana);
+        const procedimiento = row.procedimiento;
 
         if (!acc[semana]) {
             acc[semana] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
         }
 
-        acc[semana][row.procedimiento] += 1;
+        acc[semana][procedimiento] += 1;
         return acc;
     }, {});
 
@@ -55,13 +60,9 @@ async function obtenerDatos() {
     const gastroduodenoscopia = semanas.map(semana => datosAgrupados[semana]['GASTRODUODENOSCOPIA CDAV']);
     const colonoscopia = semanas.map(semana => datosAgrupados[semana]['COLONOSCOPIA CDAV']);
 
-    console.log("Semanas:", semanas);
-    console.log("GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
-    console.log("COLONOSCOPIA CDAV:", colonoscopia);
-
-    // Verificar si hay datos antes de graficar
-    if (semanas.length === 0) {
-        console.warn("No hay datos para graficar.");
+    // Verificar que los datos no estén vacíos antes de graficar
+    if (gastroduodenoscopia.length === 0 || colonoscopia.length === 0) {
+        console.error("No hay datos para graficar.");
         return;
     }
 
@@ -71,9 +72,9 @@ async function obtenerDatos() {
 
 // Función para obtener el número de semana del año
 function getWeek(date) {
-    const firstDayOfYear = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-    const pastDays = Math.floor((date - firstDayOfYear) / (24 * 60 * 60 * 1000));
-    return Math.ceil((pastDays + firstDayOfYear.getUTCDay() + 1) / 7);
+    const oneJan = new Date(date.getFullYear(), 0, 1);
+    const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
+    return Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
 }
 
 // Función para graficar los datos con Chart.js
@@ -107,7 +108,6 @@ function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
             ]
         },
         options: {
-            responsive: true,
             scales: {
                 x: {
                     title: {
