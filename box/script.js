@@ -125,8 +125,30 @@ console.log("Datos después de conversión:", df);
     console.log("Datos COLONOSCOPIA CDAV:", colonoscopia);
 
     // Iniciar la obtención de datos al cargar la página
-document.addEventListener('DOMContentLoaded', obtenerDatos);
+document.addEventListener("DOMContentLoaded", function () {
+    // Datos simulados desde la consola
+    const salas = ["GA36_CDV 441 Sala 36 CDV", "Sala 33 CDV", "GA33_CDV 440 Sala 33 CDV", "GA39_CDV 444 Sala 39 CDV", "GA37_CDV 442 Sala 37 CDV", "GA38_CDV 443 Sala 38 CDV"];
+    const gastroduodenoscopia = [106, 108, 142, 26, 89, 70];
+    const colonoscopia = [120, 59, 159, 41, 113, 79];
 
+    // Verificar si los datos están presentes antes de crear la gráfica
+    console.log("Intentando crear la gráfica con los siguientes datos:");
+    console.log("Salas:", salas);
+    console.log("GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
+    console.log("COLONOSCOPIA CDAV:", colonoscopia);
+
+    if (salas.length === 0 || gastroduodenoscopia.length === 0 || colonoscopia.length === 0) {
+        console.error("No hay suficientes datos para generar la gráfica.");
+        return;
+    }
+
+    // Obtener el canvas del DOM
+    const ctx = document.getElementById("myChart").getContext("2d");
+
+    // Si ya existe un gráfico, destruirlo antes de crear uno nuevo
+    if (window.myChart instanceof Chart) {
+        window.myChart.destroy();
+// ----
 
     // Graficar los datos
     graficarDatos(salas, gastroduodenoscopia, colonoscopia);
