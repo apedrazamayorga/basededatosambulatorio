@@ -12,7 +12,7 @@ let myChart = null; // Para evitar superposiciones de gráficos
 function parseFecha(fechaStr) {
     // Verificar que la fecha no sea indefinida ni nula
     if (!fechaStr) {
-        console.warn("Fecha no válida:", fechaStr);
+        console.warn("Fecha no válida (vacía o nula):", fechaStr);
         return null; // Retornar null si la fecha no es válida
     }
 
@@ -24,9 +24,10 @@ function parseFecha(fechaStr) {
     
     // Verificar que la fecha esté en el formato correcto
     if (day && month && year && meses[month] !== undefined) {
+        console.log(`Fecha procesada correctamente: ${fechaStr}`);
         return new Date(year, meses[month], day); // Retorna la fecha solo si es válida
     } else {
-        console.warn("Fecha mal formateada:", fechaStr);
+        console.warn("Fecha mal formateada o incompleta:", fechaStr);
         return null; // Retornar null si la fecha es incorrecta
     }
 }
@@ -51,6 +52,7 @@ async function obtenerDatos() {
                 procedimiento: row["nombre del procedimiento"]
             };
         } else {
+            console.warn("Omitiendo registro con fecha inválida:", row); // Depuración adicional
             return null; // Si la fecha es inválida, se omite esta fila
         }
     }).filter(row => row !== null); // Filtrar los registros con fechas inválidas
