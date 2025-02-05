@@ -85,44 +85,66 @@ function getWeek(date) {
 }
 
 // Función para graficar datos
-function graficarDatos(datosAgrupados) {
-    const canvas = document.getElementById('myChart');
-    if (!canvas) {
-        console.error("No se encontró el canvas con id 'myChart'");
-        return;
-    }
-    const ctx = canvas.getContext('2d');
-    if (myChart) myChart.destroy();
+function graficarDatos(datosPorSala) {
+    const container = document.getElementById('charts-container');
+    container.innerHTML = ''; // Limpiar gráficos previos
 
-    const datasets = [];
-    Object.keys(datosAgrupados).forEach(sala => {
-        Object.keys(datosAgrupados[sala]).forEach(semana => {
-            Object.keys(datosAgrupados[sala][semana]).forEach(procedimiento => {
-                datasets.push({
-                    label: `${procedimiento} - ${sala}`,
-                    data: Object.keys(datosAgrupados[sala]).map(sem => datosAgrupados[sala][sem][procedimiento] || 0),
-                    borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
-                    fill: false,
-                    borderWidth: 2
-                });
-            });
+    Object.entries(datosPorSala).forEach(([sala, datos]) => {
+        const canvasId = `chart-${sala.replace(/\s+/g, '-')}`; // Reemplaza espacios en ID
+
+        // Crear un contenedor para el gráfico
+        const chartWrapper = document.createElement('div');
+        chartWrapper.classList.add('chart-wrapper');
+
+        // Crear el canvas para el gráfico
+        const canvas = document.createElement('canvas');
+        canvas.id = canvasId;
+        chartWrapper.appendChild(canvas);
+        container.appendChild(chartWrapper);
+
+        // Crear el gráfico con los datos de la sala
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: datos.semanas,
+                datasets: [
+                    {
+                        label: 'GASTRODUODENOSCOPIA CDAV',
+                        data: datos.gastroduodenoscopia,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'COLONOSCOPIA CDAV',
+                        data: datos.colonoscopia,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Semana del Año'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Número de Procedimientos'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
         });
     });
-
-    myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: Object.keys(datosAgrupados[Object.keys(datosAgrupados)[0]] || {}),
-            datasets
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: { title: { display: true, text: 'Semana del Año' } },
-                y: { title: { display: true, text: 'Número de Procedimientos' }, beginAtZero: true }
-            }
-        }
-    });
 }
+
 
 document.addEventListener('DOMContentLoaded', obtenerDatos);
