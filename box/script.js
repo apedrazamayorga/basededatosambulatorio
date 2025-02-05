@@ -119,7 +119,7 @@ function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
     }
 
     charts[sala] = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: semanas,
             datasets: [
@@ -141,8 +141,8 @@ function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
         },
         options: {
             scales: {
-                x: { title: { display: true, text: 'Semana del Año' } },
-                y: { title: { display: true, text: 'Número de Procedimientos' }, beginAtZero: true }
+                x: { stacked: true, title: { display: true, text: 'Semana del Año' } },
+                y: { stacjed: true, title: { display: true, text: 'Número de Procedimientos' }, beginAtZero: true }
             }
         }
     });
