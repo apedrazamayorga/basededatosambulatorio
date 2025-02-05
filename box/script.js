@@ -62,111 +62,105 @@ async function obtenerDatos() {
         return;
     }
 
-    // Mostrar la primera fila para verificar las claves correctas
     console.log("Primer registro de Supabase:", data[0]);
 
-    // Asegurarse de que las claves existen en los registros
+    // Procesar los datos para extraer las salas y procedimientos
     const df = data.map(row => ({
-        fecha: parseFecha(row["Fecha del procedimiento programado"] || row["fecha del procedimiento programado"]),
+        sala: row["Sala de Adquisición"] || row["sala de adquisición"],
         procedimiento: row["nombre del procedimiento"] || row["Nombre del procedimiento"]
-    })).filter(row => row.fecha !== null && row.procedimiento); // Filtrar fechas y procedimientos nulos
+    })).filter(row => row.sala && row.procedimiento); // Filtrar datos inválidos
 
-    console.log("Datos después de conversión de fechas:", df);
+    console.log("Datos después de conversión:", df);
 
-    // Filtrar los procedimientos relevantes
+    // Filtrar los procedimientos de interés
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
 
-    console.log("Datos filtrados (solo procedimientos de interés):", dfFiltrado);
+    console.log("Datos filtrados:", dfFiltrado);
 
     if (dfFiltrado.length === 0) {
         console.warn("No hay datos para los procedimientos seleccionados.");
         return;
     }
 
-    // Agrupar por semana y nombre del procedimiento
+    // Agrupar por "Sala de Adquisición" y "Nombre del Procedimiento"
     const datosAgrupados = dfFiltrado.reduce((acc, row) => {
-        const semana = getWeek(row.fecha);
-        console.log(`Fecha: ${row.fecha} -> Semana: ${semana}`);
-        
-        if (!acc[semana]) {
-            acc[semana] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
+        if (!acc[row.sala]) {
+            acc[row.sala] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
         }
-
-        acc[semana][row.procedimiento] += 1;
+        acc[row.sala][row.procedimiento] += 1;
         return acc;
     }, {});
 
-    console.log("Datos agrupados por semana:", datosAgrupados);
+    console.log("Datos agrupados por Sala de Adquisición:", datosAgrupados);
 
-    // Convertir a arrays para Chart.js
-    const semanas = Object.keys(datosAgrupados).sort((a, b) => a - b);
-    const gastroduodenoscopia = semanas.map(semana => datosAgrupados[semana]['GASTRODUODENOSCOPIA CDAV'] || 0);
-    const colonoscopia = semanas.map(semana => datosAgrupados[semana]['COLONOSCOPIA CDAV'] || 0);
+    // Convertir a formato de Chart.js
+    const salas = Object.keys(datosAgrupados);
+    const gastroduodenoscopia = salas.map(sala => datosAgrupados[sala]['GASTRODUODENOSCOPIA CDAV'] || 0);
+    const colonoscopia = salas.map(sala => datosAgrupados[sala]['COLONOSCOPIA CDAV'] || 0);
 
-    console.log("Semanas:", semanas);
+    console.log("Salas:", salas);
     console.log("Datos GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
     console.log("Datos COLONOSCOPIA CDAV:", colonoscopia);
 
     // Graficar los datos
-    if (semanas.length === 0) {
-        console.warn("No hay datos para graficar.");
+    graficarDatos(salas, gastroduodenoscopia, colonoscopia);
+}
+
+// Función para graficar los datos como barras agrupadas
+function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
+    const canvas = document.getElementById('myChart');
+    if (!canvas) {
+        console.error("No se encontró el elemento <canvas> con id 'myChart'. Verifica que esté en el HTML.");
         return;
     }
-
-    graficarDatos(semanas, gastroduodenoscopia, colonoscopia);
-}
-
-// Función para obtener el número de semana del año
-function getWeek(date) {
-    const oneJan = new Date(date.getFullYear(), 0, 1);
-    const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
-    return Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
-}
-
-// Función para graficar los datos con Chart.js
-function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
-    const ctx = document.getElementById('myChart').getContext('2d');
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error("No se pudo obtener el contexto 2D del canvas.");
+        return;
+    }
 
     if (myChart) {
         myChart.destroy();
     }
 
     myChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: semanas,
+            labels: salas, // Eje Y: "Sala de Adquisición"
             datasets: [
                 {
                     label: 'GASTRODUODENOSCOPIA CDAV',
                     data: gastroduodenoscopia,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2
+                    borderWidth: 1
                 },
                 {
                     label: 'COLONOSCOPIA CDAV',
                     data: colonoscopia,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2
+                    borderWidth: 1
                 }
             ]
         },
         options: {
+            indexAxis: 'y', // Hace que el gráfico sea horizontal
             scales: {
                 x: {
-                    title: {
-                        display: true,
-                        text: 'Semana del Año'
-                    }
-                },
-                y: {
                     title: {
                         display: true,
                         text: 'Número de Procedimientos'
                     },
                     beginAtZero: true
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Sala de Adquisición'
+                    }
                 }
             }
         }
