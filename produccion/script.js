@@ -10,12 +10,25 @@ let myChart = null; // Para evitar superposiciones de gráficos
 
 // Función para convertir fechas en formato 'DD-MMM-YYYY' a un objeto Date
 function parseFecha(fechaStr) {
+    // Verificar que la fecha no sea indefinida ni nula
+    if (!fechaStr) {
+        console.warn("Fecha no válida:", fechaStr);
+        return null; // Retornar null si la fecha no es válida
+    }
+
     const meses = {
         'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
         'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
     };
     const [day, month, year] = fechaStr.toLowerCase().split('-');
-    return new Date(year, meses[month], day); // Restamos 1 al mes porque JavaScript usa índices basados en 0
+    
+    // Verificar que la fecha esté en el formato correcto
+    if (day && month && year && meses[month] !== undefined) {
+        return new Date(year, meses[month], day); // Retorna la fecha solo si es válida
+    } else {
+        console.warn("Fecha mal formateada:", fechaStr);
+        return null; // Retornar null si la fecha es incorrecta
+    }
 }
 
 // Función para obtener y procesar los datos
@@ -32,12 +45,15 @@ async function obtenerDatos() {
     // Procesar los datos
     const df = data.map(row => {
         const fecha = parseFecha(row["fecha del procedimiento programado"]);
-        console.log("Fecha procesada:", fecha);
-        return {
-            fecha: fecha,
-            procedimiento: row["nombre del procedimiento"]
-        };
-    });
+        if (fecha) {
+            return {
+                fecha: fecha,
+                procedimiento: row["nombre del procedimiento"]
+            };
+        } else {
+            return null; // Si la fecha es inválida, se omite esta fila
+        }
+    }).filter(row => row !== null); // Filtrar los registros con fechas inválidas
 
     console.log("Lista de procedimientos:", df.map(r => r.procedimiento));
 
