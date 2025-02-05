@@ -15,7 +15,7 @@ async function obtenerDatos() {
         return;
     }
 
-    // Procesar los datos
+      // Procesar los datos
     const df = data.map(row => ({
         fecha: new Date(row['fecha del procedimiento programado']), // Columna de fecha
         procedimiento: row['nombre del procedimiento'] // Columna de nombre del procedimiento
@@ -71,4 +71,32 @@ function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
                 },
                 {
                     label: 'COLONOSCOPIA CDAV',
-                   
+                    data: colonoscopia,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Semana del Año'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Número de Procedimientos'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Iniciar la obtención de datos al cargar la página
+document.addEventListener('DOMContentLoaded', obtenerDatos);
