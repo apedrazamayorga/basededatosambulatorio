@@ -124,36 +124,9 @@ console.log("Datos después de conversión:", df);
     console.log("Datos GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
     console.log("Datos COLONOSCOPIA CDAV:", colonoscopia);
 
-    // Iniciar la obtención de datos al cargar la página
-document.addEventListener("DOMContentLoaded", function () {
-    // Datos simulados desde la consola
-    const salas = ["GA36_CDV 441 Sala 36 CDV", "Sala 33 CDV", "GA33_CDV 440 Sala 33 CDV", "GA39_CDV 444 Sala 39 CDV", "GA37_CDV 442 Sala 37 CDV", "GA38_CDV 443 Sala 38 CDV"];
-    const gastroduodenoscopia = [106, 108, 142, 26, 89, 70];
-    const colonoscopia = [120, 59, 159, 41, 113, 79];
-
-    // Verificar si los datos están presentes antes de crear la gráfica
-    console.log("Intentando crear la gráfica con los siguientes datos:");
-    console.log("Salas:", salas);
-    console.log("GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
-    console.log("COLONOSCOPIA CDAV:", colonoscopia);
-
-    if (salas.length === 0 || gastroduodenoscopia.length === 0 || colonoscopia.length === 0) {
-        console.error("No hay suficientes datos para generar la gráfica.");
-        return;
-    }
-
-    // Obtener el canvas del DOM
-    const ctx = document.getElementById("myChart").getContext("2d");
-
-    // Si ya existe un gráfico, destruirlo antes de crear uno nuevo
-    if (window.myChart instanceof Chart) {
-        window.myChart.destroy();
-// ----
-
     // Graficar los datos
     graficarDatos(salas, gastroduodenoscopia, colonoscopia);
 }
-
 
 // Función para graficar los datos como barras agrupadas
 function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
@@ -166,44 +139,100 @@ function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
 
     console.log("Datos a graficar:", salas, gastroduodenoscopia, colonoscopia);
 
-    myChart = new Chart(ctx, {
-        type: 'bar',
+   document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM completamente cargado.");
+
+    // Datos simulados desde la consola
+    const salas = [
+        "GA36_CDV 441 Sala 36 CDV",
+        "Sala 33 CDV",
+        "GA33_CDV 440 Sala 33 CDV",
+        "GA39_CDV 444 Sala 39 CDV",
+        "GA37_CDV 442 Sala 37 CDV",
+        "GA38_CDV 443 Sala 38 CDV"
+    ];
+    const gastroduodenoscopia = [106, 108, 142, 26, 89, 70];
+    const colonoscopia = [120, 59, 159, 41, 113, 79];
+
+    // 🔍 Verificar que los datos no estén vacíos
+    console.log("📊 Salas:", salas);
+    console.log("📊 Datos GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
+    console.log("📊 Datos COLONOSCOPIA CDAV:", colonoscopia);
+
+    if (!salas.length || !gastroduodenoscopia.length || !colonoscopia.length) {
+        console.error("❌ No hay datos suficientes para generar la gráfica.");
+        return;
+    }
+
+    // Obtener el canvas del DOM
+    const canvas = document.getElementById("myChart");
+
+    if (!canvas) {
+        console.error("❌ No se encontró el canvas con ID 'myChart'.");
+        return;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    // Si ya existe un gráfico, destruirlo antes de crear uno nuevo
+    if (window.myChart instanceof Chart) {
+        console.log("⚠️ Gráfico existente encontrado. Destruyéndolo...");
+        window.myChart.destroy();
+    }
+
+    console.log("✅ Creando gráfico...");
+
+    // Crear gráfico
+    window.myChart = new Chart(ctx, {
+        type: "bar",
         data: {
             labels: salas,
             datasets: [
                 {
-                    label: 'GASTRODUODENOSCOPIA CDAV',
+                    label: "GASTRODUODENOSCOPIA CDAV",
                     data: gastroduodenoscopia,
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
+                    backgroundColor: "rgba(54, 162, 235, 0.5)",
+                    borderColor: "rgba(54, 162, 235, 1)",
+                    borderWidth: 1,
                 },
                 {
-                    label: 'COLONOSCOPIA CDAV',
+                    label: "COLONOSCOPIA CDAV",
                     data: colonoscopia,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }
-            ]
+                    backgroundColor: "rgba(255, 99, 132, 0.5)",
+                    borderColor: "rgba(255, 99, 132, 1)",
+                    borderWidth: 1,
+                },
+            ],
         },
         options: {
-            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Número de Procedimientos'
-                    },
-                    beginAtZero: true
-                },
                 y: {
-                    title: {
-                        display: true,
-                        text: 'Sala de Adquisición'
-                    }
-                }
-            }
-        }
+                    beginAtZero: true,
+                    ticks: {
+                        color: "black", // Color de los números en eje Y
+                    },
+                },
+                x: {
+                    ticks: {
+                        color: "black", // Color de los nombres de las salas
+                    },
+                },
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "black",
+                        font: {
+                            family: "Arial",
+                            size: 14,
+                        },
+                    },
+                },
+            },
+        },
     });
-}
+
+    console.log("✅ Gráfico creado con éxito.");
+});
