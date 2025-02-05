@@ -6,15 +6,13 @@ const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4"; // Usa una clave segura
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let charts = {}; // Almacena los gráficos para evitar superposiciones
+let charts = {}; // Almacena los gráficos
 
-// Función para convertir fechas de 'DD-MMM-YYYY' a un objeto Date
+// Función para convertir fechas de 'DD-MMM-YYYY' a Date
 function parseFecha(fechaStr) {
-    if (!fechaStr || typeof fechaStr !== "string") {
-        return null;
-    }
-
+    if (!fechaStr || typeof fechaStr !== "string") return null;
     fechaStr = fechaStr.trim();
+
     const meses = { 'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
                     'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11 };
 
@@ -28,14 +26,14 @@ function parseFecha(fechaStr) {
     return new Date(parseInt(año, 10), mesIndex, parseInt(dia, 10));
 }
 
-// Función para obtener el número de semana del año
+// Obtener número de semana del año
 function getWeek(date) {
     const oneJan = new Date(date.getFullYear(), 0, 1);
     const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
     return Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
 }
 
-// Función para obtener y procesar los datos
+// Obtener y procesar datos
 async function obtenerDatos() {
     const { data, error } = await supabase.from('produccion').select('*');
 
@@ -95,7 +93,7 @@ async function obtenerDatos() {
     });
 }
 
-// Función para crear gráficos en Chart.js
+// Crear gráficos de barras apiladas en Chart.js
 function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
     const container = document.getElementById('charts-container');
 
@@ -119,30 +117,35 @@ function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
     }
 
     charts[sala] = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: semanas,
             datasets: [
                 {
                     label: 'GASTRODUODENOSCOPIA CDAV',
                     data: gastroduodenoscopia,
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2
+                    borderWidth: 1
                 },
                 {
                     label: 'COLONOSCOPIA CDAV',
                     data: colonoscopia,
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2
+                    borderWidth: 1
                 }
             ]
         },
         options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: `Procedimientos en Sala: ${sala}` }
+            },
             scales: {
-                x: { title: { display: true, text: 'Semana del Año' } },
-                y: { title: { display: true, text: 'Número de Procedimientos' }, beginAtZero: true }
+                x: { stacked: true, title: { display: true, text: 'Semana del Año' } },
+                y: { stacked: true, title: { display: true, text: 'Número de Procedimientos' }, beginAtZero: true }
             }
         }
     });
@@ -150,3 +153,4 @@ function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
 
 // Iniciar la obtención de datos al cargar la página
 document.addEventListener('DOMContentLoaded', obtenerDatos);
+
