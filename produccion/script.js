@@ -8,12 +8,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let myChart = null; // Para evitar superposiciones de gráficos
 
-// Función para convertir fechas en formato 'DD-MMM-YYYY' a un objeto Date
+// Función para convertir fechas de 'DD-MMM-YYYY' a un objeto Date
 function parseFecha(fechaStr) {
     if (!fechaStr || typeof fechaStr !== "string") {
         console.warn("Fecha no válida (vacía o nula):", fechaStr);
         return null;
     }
+
+    // Eliminar espacios en blanco y caracteres no imprimibles
+    fechaStr = fechaStr.trim().replace(/\s+/g, '');
 
     // Diccionario de meses en español
     const meses = {
@@ -21,24 +24,25 @@ function parseFecha(fechaStr) {
         'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11
     };
 
-    // Limpiar espacios y dividir la fecha en partes
-    const partes = fechaStr.trim().toLowerCase().split('-');
+    // Verificar si tiene el formato correcto 'DD-MMM-YYYY'
+    const regexFecha = /^(\d{2})-([a-zA-Z]{3})-(\d{4})$/;
+    const match = fechaStr.match(regexFecha);
 
-    if (partes.length !== 3) {
+    if (!match) {
         console.warn("Formato de fecha incorrecto:", fechaStr);
         return null;
     }
 
-    const [dia, mes, año] = partes;
-    const mesIndex = meses[mes];
+    const [, dia, mes, año] = match;
+    const mesIndex = meses[mes.toLowerCase()];
 
-    if (!mesIndex && mesIndex !== 0) {
+    if (mesIndex === undefined) {
         console.warn("Mes no reconocido en la fecha:", fechaStr);
         return null;
     }
 
-    const fecha = new Date(año, mesIndex, parseInt(dia, 10));
-    
+    const fecha = new Date(parseInt(año, 10), mesIndex, parseInt(dia, 10));
+
     if (isNaN(fecha.getTime())) {
         console.warn("Fecha inválida tras conversión:", fechaStr);
         return null;
@@ -60,29 +64,16 @@ async function obtenerDatos() {
     console.log("Datos obtenidos de Supabase:", data);
 
     // Procesar los datos
-    const df = data.map(row => {
-        const fecha = parseFecha(row["fecha del procedimiento programado"]);
-        if (fecha) {
-            return {
-                fecha: fecha,
-                procedimiento: row["nombre del procedimiento"]
-            };
-        } else {
-            console.warn("Omitiendo registro con fecha inválida:", row);
-            return null;
-        }
-    }).filter(row => row !== null); 
+    const df = data.map(row => ({
+        fecha: parseFecha(row["Fecha del procedimiento programado"]),
+        procedimiento: row["nombre del procedimiento"]
+    })).filter(row => row.fecha !== null); // Filtrar fechas nulas
 
     console.log("Lista de procedimientos:", df.map(r => r.procedimiento));
 
     // Filtrar los procedimientos relevantes
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
-
-    if (dfFiltrado.length === 0) {
-        console.error("No se encontraron procedimientos relevantes.");
-        return;
-    }
 
     // Agrupar por semana y nombre del procedimiento
     const datosAgrupados = dfFiltrado.reduce((acc, row) => {
@@ -98,14 +89,10 @@ async function obtenerDatos() {
         return acc;
     }, {});
 
+    // Convertir a arrays para Chart.js
     const semanas = Object.keys(datosAgrupados).sort((a, b) => a - b);
     const gastroduodenoscopia = semanas.map(semana => datosAgrupados[semana]['GASTRODUODENOSCOPIA CDAV']);
     const colonoscopia = semanas.map(semana => datosAgrupados[semana]['COLONOSCOPIA CDAV']);
-
-    if (gastroduodenoscopia.length === 0 || colonoscopia.length === 0) {
-        console.error("No hay datos para graficar.");
-        return;
-    }
 
     // Graficar los datos
     graficarDatos(semanas, gastroduodenoscopia, colonoscopia);
@@ -122,6 +109,7 @@ function getWeek(date) {
 function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
     const ctx = document.getElementById('myChart').getContext('2d');
 
+    // Destruir el gráfico anterior si existe
     if (myChart) {
         myChart.destroy();
     }
