@@ -150,4 +150,3 @@ function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
 
 // Iniciar la obtención de datos al cargar la página
 document.addEventListener('DOMContentLoaded', obtenerDatos);
-
