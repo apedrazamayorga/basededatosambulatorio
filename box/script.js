@@ -68,13 +68,24 @@ async function obtenerDatos() {
     console.log("Primer registro de Supabase:", data[0]);
 
     // Procesar los datos para extraer las salas y procedimientos
-   const df = data.map(row => ({
-    fecha: parseFecha(row["Fecha del procedimiento programado"]?.trim() || row["fecha del procedimiento programado"]?.trim()),
-    procedimiento: row["nombre del procedimiento"]?.trim() || row["Nombre del procedimiento"]?.trim(),
-    sala: row["sala de adquisición"]?.trim() || row["Sala de Adquisición"]?.trim() // Agregando la sala
-})).filter(row => row.fecha !== null && row.procedimiento && row.sala);
+const df = data.map(row => {
+    console.log("Datos de fecha, procedimiento y sala:", row["Fecha del procedimiento programado"], row["nombre del procedimiento"], row["sala de adquisición"]);
 
-    console.log("Datos después de conversión:", df);
+    const fecha = parseFecha(row["Fecha del procedimiento programado"]?.trim() || row["fecha del procedimiento programado"]?.trim());
+    const procedimiento = row["nombre del procedimiento"]?.trim() || row["Nombre del procedimiento"]?.trim();
+    const sala = row["sala de adquisición"]?.trim() || row["Sala de Adquisición"]?.trim();
+
+    console.log("Fecha convertida:", fecha);
+
+    return {
+        fecha,
+        procedimiento,
+        sala
+    };
+}).filter(row => row.fecha !== null && row.procedimiento && row.sala);
+
+console.log("Datos después de conversión:", df);
+
  
     // Filtrar los procedimientos de interés
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
