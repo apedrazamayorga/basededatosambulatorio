@@ -88,4 +88,47 @@ function graficarSemana(semana) {
         datosAgrupados[row.sala][row.procedimiento] += 1;
     });
 
-    const salas = Object.keys(d
+    const salas = Object.keys(datosAgrupados);
+    const procedimientosUnicos = [...new Set(dfFiltrado.map(row => row.procedimiento))];
+
+    // Crear datasets para cada procedimiento
+    const datasets = procedimientosUnicos.map(procedimiento => ({
+        label: procedimiento,
+        data: salas.map(sala => datosAgrupados[sala][procedimiento] || 0),
+        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`,
+        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+        borderWidth: 1,
+    }));
+
+    graficarDatos(salas, datasets);
+}
+
+// Función para graficar los datos
+function graficarDatos(salas, datasets) {
+    const ctx = document.getElementById('myChart')?.getContext('2d');
+    if (!ctx) return;
+
+    if (myChart) myChart.destroy();
+
+    myChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: salas,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, ticks: { color: "black" } },
+                x: { ticks: { color: "black" } },
+            },
+            plugins: {
+                legend: { labels: { color: "black", font: { family: "Arial", size: 14 } } },
+            },
+        },
+    });
+}
+
+// Ejecutar la función cuando el DOM esté cargado
+document.addEventListener("DOMContentLoaded", () => obtenerDatos());
