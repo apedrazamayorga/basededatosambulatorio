@@ -57,10 +57,19 @@ async function obtenerDatos() {
     
     console.log("Datos obtenidos de Supabase:", data);
 
+    if (!data || data.length === 0) {
+        console.warn("No se recibieron datos desde Supabase.");
+        return;
+    }
+
+    // Mostrar la primera fila para verificar las claves correctas
+    console.log("Primer registro de Supabase:", data[0]);
+
+    // Asegurarse de que las claves existen en los registros
     const df = data.map(row => ({
-        fecha: parseFecha(row["Fecha del procedimiento programado"]),
-        procedimiento: row["nombre del procedimiento"]
-    })).filter(row => row.fecha !== null); // Filtrar fechas nulas
+        fecha: parseFecha(row["Fecha del procedimiento programado"] || row["fecha del procedimiento programado"]),
+        procedimiento: row["nombre del procedimiento"] || row["Nombre del procedimiento"]
+    })).filter(row => row.fecha !== null && row.procedimiento); // Filtrar fechas y procedimientos nulos
 
     console.log("Datos después de conversión de fechas:", df);
 
@@ -115,4 +124,55 @@ function getWeek(date) {
     return Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
 }
 
-// Función para graficar 
+// Función para graficar los datos con Chart.js
+function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: semanas,
+            datasets: [
+                {
+                    label: 'GASTRODUODENOSCOPIA CDAV',
+                    data: gastroduodenoscopia,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'COLONOSCOPIA CDAV',
+                    data: colonoscopia,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Semana del Año'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Número de Procedimientos'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Iniciar la obtención de datos al cargar la página
+document.addEventListener('DOMContentLoaded', obtenerDatos);
+
