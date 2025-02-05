@@ -10,26 +10,42 @@ let myChart = null; // Para evitar superposiciones de gráficos
 
 // Función para convertir fechas en formato 'DD-MMM-YYYY' a un objeto Date
 function parseFecha(fechaStr) {
-    // Verificar que la fecha no sea indefinida ni nula
-    if (!fechaStr) {
+    if (!fechaStr || typeof fechaStr !== "string") {
         console.warn("Fecha no válida (vacía o nula):", fechaStr);
-        return null; // Retornar null si la fecha no es válida
+        return null;
     }
 
+    // Diccionario de meses en español
     const meses = {
-        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+        'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11
     };
-    const [day, month, year] = fechaStr.toLowerCase().split('-');
-    
-    // Verificar que la fecha esté en el formato correcto
-    if (day && month && year && meses[month] !== undefined) {
-        console.log(`Fecha procesada correctamente: ${fechaStr}`);
-        return new Date(year, meses[month], day); // Retorna la fecha solo si es válida
-    } else {
-        console.warn("Fecha mal formateada o incompleta:", fechaStr);
-        return null; // Retornar null si la fecha es incorrecta
+
+    // Limpiar espacios y dividir la fecha en partes
+    const partes = fechaStr.trim().toLowerCase().split('-');
+
+    if (partes.length !== 3) {
+        console.warn("Formato de fecha incorrecto:", fechaStr);
+        return null;
     }
+
+    const [dia, mes, año] = partes;
+    const mesIndex = meses[mes];
+
+    if (!mesIndex && mesIndex !== 0) {
+        console.warn("Mes no reconocido en la fecha:", fechaStr);
+        return null;
+    }
+
+    const fecha = new Date(año, mesIndex, parseInt(dia, 10));
+    
+    if (isNaN(fecha.getTime())) {
+        console.warn("Fecha inválida tras conversión:", fechaStr);
+        return null;
+    }
+
+    console.log(`Fecha procesada correctamente: ${fechaStr} -> ${fecha}`);
+    return fecha;
 }
 
 // Función para obtener y procesar los datos
@@ -52,10 +68,10 @@ async function obtenerDatos() {
                 procedimiento: row["nombre del procedimiento"]
             };
         } else {
-            console.warn("Omitiendo registro con fecha inválida:", row); // Depuración adicional
-            return null; // Si la fecha es inválida, se omite esta fila
+            console.warn("Omitiendo registro con fecha inválida:", row);
+            return null;
         }
-    }).filter(row => row !== null); // Filtrar los registros con fechas inválidas
+    }).filter(row => row !== null); 
 
     console.log("Lista de procedimientos:", df.map(r => r.procedimiento));
 
@@ -63,7 +79,6 @@ async function obtenerDatos() {
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
 
-    // Si no hay datos filtrados, muestra un mensaje y termina
     if (dfFiltrado.length === 0) {
         console.error("No se encontraron procedimientos relevantes.");
         return;
@@ -83,12 +98,10 @@ async function obtenerDatos() {
         return acc;
     }, {});
 
-    // Convertir a arrays para Chart.js
     const semanas = Object.keys(datosAgrupados).sort((a, b) => a - b);
     const gastroduodenoscopia = semanas.map(semana => datosAgrupados[semana]['GASTRODUODENOSCOPIA CDAV']);
     const colonoscopia = semanas.map(semana => datosAgrupados[semana]['COLONOSCOPIA CDAV']);
 
-    // Verificar que los datos no estén vacíos antes de graficar
     if (gastroduodenoscopia.length === 0 || colonoscopia.length === 0) {
         console.error("No hay datos para graficar.");
         return;
@@ -109,7 +122,6 @@ function getWeek(date) {
 function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
     const ctx = document.getElementById('myChart').getContext('2d');
 
-    // Destruir el gráfico anterior si existe
     if (myChart) {
         myChart.destroy();
     }
@@ -157,3 +169,4 @@ function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
 
 // Iniciar la obtención de datos al cargar la página
 document.addEventListener('DOMContentLoaded', obtenerDatos);
+
