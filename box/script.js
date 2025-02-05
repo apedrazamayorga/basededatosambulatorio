@@ -119,7 +119,7 @@ function crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia) {
     }
 
     charts[sala] = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: semanas,
             datasets: [
