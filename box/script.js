@@ -33,7 +33,7 @@ async function obtenerDatos() {
             procedimiento: row["nombre del procedimiento"] || row["Nombre del procedimiento"],
             sala: row["sala de adquisición"] || row["Sala de adquisición"]
         }))
-        .filter(row => procedimientosInteres.includes(row.procedimiento) && row.sala); // Filtrar nulos
+        .filter(row => row.procedimiento && procedimientosInteres.includes(row.procedimiento) && row.sala); // Filtrar nulos
 
     console.log("Datos filtrados (con sala de adquisición):", df);
 
