@@ -3,13 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfico de Procedimientos</title>
+    <title>Gráficos de Procedimientos por Sala</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script type="module" src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #charts-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .chart-wrapper {
+            width: 45%;
+            min-width: 300px;
+            margin: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Número de Procedimientos por Semana</h1>
+    <h1>Gráficos de Procedimientos por Sala</h1>
     <div id="charts-container"></div>
+
+    <script src="script.js"></script>
 </body>
 </html>
