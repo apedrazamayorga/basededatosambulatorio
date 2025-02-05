@@ -8,10 +8,14 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let myChart = null; // Para evitar superposiciones de gráficos
 
-// Función para convertir fechas en formato 'DD/MM/YYYY' a un objeto Date
+// Función para convertir fechas en formato 'DD-MMM-YYYY' a un objeto Date
 function parseFecha(fechaStr) {
-    const [day, month, year] = fechaStr.split('/');
-    return new Date(year, month - 1, day); // Restamos 1 al mes porque JavaScript usa índices basados en 0
+    const meses = {
+        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+    };
+    const [day, month, year] = fechaStr.toLowerCase().split('-');
+    return new Date(year, meses[month], day); // Restamos 1 al mes porque JavaScript usa índices basados en 0
 }
 
 // Función para obtener y procesar los datos
