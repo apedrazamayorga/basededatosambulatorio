@@ -69,15 +69,16 @@ async function obtenerDatos() {
 
     // Procesar los datos para extraer las salas y procedimientos
 const df = data.map(row => {
-    console.log("Claves de los datos:", Object.keys(row));  // Esto te ayudará a ver las claves exactas
+    console.log("Claves de los datos:", Object.keys(row));  // Log de las claves para verificar
 
     const fecha = parseFecha(row["Fecha del procedimiento programado"]?.trim() || row["fecha del procedimiento programado"]?.trim());
-    const procedimiento = row["nombre del procedimiento"]?.trim() || row["Nombre del procedimiento"]?.trim();
-   const sala = row["Sala de adquisición"]?.trim();  // Cambio aquí para usar la clave correcta
+    const procedimiento = row["Nombre del procedimiento"]?.trim() || row["nombre del procedimiento"]?.trim();
+    
+    // Revisar la sala antes de aplicar trim
+    console.log("Sala original (sin trim):", row["Sala de adquisición"]);
 
-    console.log("Fecha convertida:", fecha);
-    console.log("Procedimiento:", procedimiento);
-    console.log("Sala:", sala);
+    const sala = row["Sala de adquisición"]?.trim();  // Intentar acceder y eliminar espacios
+    console.log("Sala procesada:", sala);
 
     return {
         fecha,
@@ -87,6 +88,7 @@ const df = data.map(row => {
 }).filter(row => row.fecha !== null && row.procedimiento && row.sala);
 
 console.log("Datos después de conversión:", df);
+
  
     // Filtrar los procedimientos de interés
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
