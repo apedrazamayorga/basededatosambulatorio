@@ -17,11 +17,15 @@ async function obtenerDatos() {
         return;
     }
     
+    console.log("Datos obtenidos de Supabase:", data);
+
     // Procesar los datos
     const df = data.map(row => ({
-        fecha: new Date(row['fecha del procedimiento programado']),
-        procedimiento: row['nombre del procedimiento']
+        fecha: new Date(row["fecha del procedimiento programado"]),
+        procedimiento: row["nombre del procedimiento"]
     }));
+
+    console.log("Lista de procedimientos:", df.map(r => r.procedimiento));
 
     // Filtrar los procedimientos relevantes
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
@@ -30,6 +34,7 @@ async function obtenerDatos() {
     // Agrupar por semana y nombre del procedimiento
     const datosAgrupados = dfFiltrado.reduce((acc, row) => {
         const semana = getWeek(row.fecha);
+        console.log("Semana calculada para", row.fecha, ":", semana);
         const procedimiento = row.procedimiento;
 
         if (!acc[semana]) {
@@ -51,7 +56,9 @@ async function obtenerDatos() {
 
 // Función para obtener el número de semana del año
 function getWeek(date) {
-    return new Intl.DateTimeFormat('es', { week: 'numeric' }).format(date);
+    const oneJan = new Date(date.getFullYear(), 0, 1);
+    const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
+    return Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
 }
 
 // Función para graficar los datos con Chart.js
@@ -106,3 +113,4 @@ function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
 
 // Iniciar la obtención de datos al cargar la página
 document.addEventListener('DOMContentLoaded', obtenerDatos);
+
