@@ -62,4 +62,67 @@ async function obtenerDatos() {
     const colonoscopia = salas.map(sala => datosAgrupados[sala]['COLONOSCOPIA CDAV'] || 0);
 
     console.log("Salas:", salas);
-    console.log("Datos GASTRODUODENOSCOPIA CDAV:", gast
+    console.log("Datos GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
+    console.log("Datos COLONOSCOPIA CDAV:", colonoscopia);
+
+    // Graficar los datos
+    if (salas.length === 0) {
+        console.warn("No hay datos para graficar.");
+        return;
+    }
+
+    graficarDatos(salas, gastroduodenoscopia, colonoscopia);
+}
+
+// Función para graficar los datos con Chart.js
+function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: salas,
+            datasets: [
+                {
+                    label: 'GASTRODUODENOSCOPIA CDAV',
+                    data: gastroduodenoscopia,
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'COLONOSCOPIA CDAV',
+                    data: colonoscopia,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Salas de Adquisición'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Número de Procedimientos'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Iniciar la obtención de datos al cargar la página
+document.addEventListener('DOMContentLoaded', obtenerDatos);
