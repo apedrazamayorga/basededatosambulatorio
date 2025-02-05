@@ -19,41 +19,43 @@ async function obtenerDatos() {
     
     console.log("Datos obtenidos de Supabase:", data);
 
-    // Procesar los datos
     const df = data.map(row => ({
         fecha: parseFecha(row["Fecha del procedimiento programado"]),
         sala: row["sala de adquisición"],
         procedimiento: row["nombre del procedimiento"]
     })).filter(row => row.fecha !== null && row.sala && row.procedimiento);
 
-    // Filtrar los procedimientos relevantes
+    console.log("Datos procesados:", df);
+
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
 
-    // Agrupar por semana, sala y procedimiento
+    console.log("Datos filtrados:", dfFiltrado);
+
     const datosAgrupados = dfFiltrado.reduce((acc, row) => {
         const semana = getWeek(row.fecha);
         const sala = row.sala;
         const procedimiento = row.procedimiento;
 
-        if (!acc[sala]) {
-            acc[sala] = {};
-        }
-        if (!acc[sala][semana]) {
-            acc[sala][semana] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
-        }
+        if (!acc[sala]) acc[sala] = {};
+        if (!acc[sala][semana]) acc[sala][semana] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
+
         acc[sala][semana][procedimiento] += 1;
         return acc;
     }, {});
 
-    // Crear gráficos para cada sala
+    console.log("Datos agrupados por sala y semana:", datosAgrupados);
+
     Object.keys(datosAgrupados).forEach(sala => {
         const semanas = Object.keys(datosAgrupados[sala]).sort((a, b) => a - b);
         const gastroduodenoscopia = semanas.map(semana => datosAgrupados[sala][semana]['GASTRODUODENOSCOPIA CDAV'] || 0);
         const colonoscopia = semanas.map(semana => datosAgrupados[sala][semana]['COLONOSCOPIA CDAV'] || 0);
 
+        console.log(`Creando gráfico para sala: ${sala}`);
         crearGrafico(sala, semanas, gastroduodenoscopia, colonoscopia);
     });
+
+    console.log("Elementos en charts-container:", document.getElementById('charts-container').innerHTML);
 }
 
 // Función para convertir fecha de formato "dd-mmm-yyyy" a Date
