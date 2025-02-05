@@ -124,9 +124,14 @@ console.log("Datos después de conversión:", df);
     console.log("Datos GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
     console.log("Datos COLONOSCOPIA CDAV:", colonoscopia);
 
+    // Iniciar la obtención de datos al cargar la página
+document.addEventListener('DOMContentLoaded', obtenerDatos);
+
+
     // Graficar los datos
     graficarDatos(salas, gastroduodenoscopia, colonoscopia);
 }
+
 
 // Función para graficar los datos como barras agrupadas
 function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
@@ -180,6 +185,3 @@ function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
         }
     });
 }
-
-// Iniciar la obtención de datos al cargar la página
-document.addEventListener('DOMContentLoaded', obtenerDatos);
