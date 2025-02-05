@@ -129,16 +129,15 @@ console.log("Datos después de conversión:", df);
 }
 
 // Función para graficar los datos como barras agrupadas
-function graficarDatos(datosAgrupados) {
+function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
     const ctx = document.getElementById('myChart').getContext('2d');
+    console.log("Contexto del gráfico:", ctx);  // Verifica si el contexto está correcto
 
     if (myChart) {
         myChart.destroy();
     }
 
-    const salas = Object.keys(datosAgrupados);
-    const gastroduodenoscopia = salas.map(sala => datosAgrupados[sala]['GASTRODUODENOSCOPIA CDAV'] || 0);
-    const colonoscopia = salas.map(sala => datosAgrupados[sala]['COLONOSCOPIA CDAV'] || 0);
+    console.log("Datos a graficar:", salas, gastroduodenoscopia, colonoscopia);
 
     myChart = new Chart(ctx, {
         type: 'bar',
