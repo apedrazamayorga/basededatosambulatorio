@@ -109,12 +109,22 @@ async function obtenerDatos() {
 
 // Función para graficar los datos como barras agrupadas
 function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
-    const canvas = document.getElementById('myChart');
-    if (!canvas) {
-        console.error("No se encontró el elemento <canvas> con id 'myChart'. Verifica que esté en el HTML.");
+    console.log("Intentando graficar...");
+    console.log("Salas:", salas);
+    console.log("GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
+    console.log("COLONOSCOPIA CDAV:", colonoscopia);
+
+    if (salas.length === 0 || (gastroduodenoscopia.length === 0 && colonoscopia.length === 0)) {
+        console.warn("No hay datos suficientes para graficar.");
         return;
     }
-    
+
+    const canvas = document.getElementById('myChart');
+    if (!canvas) {
+        console.error("No se encontró el <canvas> con id 'myChart'.");
+        return;
+    }
+
     const ctx = canvas.getContext('2d');
     if (!ctx) {
         console.error("No se pudo obtener el contexto 2D del canvas.");
@@ -165,6 +175,8 @@ function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
             }
         }
     });
+
+    console.log("Gráfico generado exitosamente.");
 }
 
 // Iniciar la obtención de datos al cargar la página
