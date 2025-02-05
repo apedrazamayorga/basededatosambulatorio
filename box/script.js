@@ -15,11 +15,14 @@ function parseFecha(fechaStr) {
         return null;
     }
 
-    fechaStr = fechaStr.trim();
-    const meses = { 'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
-                    'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11 };
+    fechaStr = fechaStr.trim().toLowerCase();
 
-    const regexFecha = /^(\d{2})-([a-zA-Z]{3})-(\d{4})$/;
+    const meses = { 
+        'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11 
+    };
+
+    const regexFecha = /^(\d{2})-([a-z]{3})-(\d{4})$/;
     const match = fechaStr.match(regexFecha);
 
     if (!match) {
@@ -28,21 +31,21 @@ function parseFecha(fechaStr) {
     }
 
     const [, dia, mesTexto, año] = match;
-    const mesIndex = meses[mesTexto.toLowerCase()];
+    const mesIndex = meses[mesTexto];
 
     if (mesIndex === undefined) {
-        console.warn("Mes no reconocido en la fecha:", fechaStr);
+        console.warn("Mes no reconocido:", mesTexto);
         return null;
     }
 
     const fecha = new Date(parseInt(año, 10), mesIndex, parseInt(dia, 10));
 
     if (isNaN(fecha.getTime())) {
-        console.warn("Fecha inválida tras conversión:", fechaStr);
+        console.warn("Fecha inválida:", fechaStr);
         return null;
     }
 
-    console.log(`Fecha procesada correctamente: ${fechaStr} -> ${fecha}`);
+    console.log(`✅ Fecha procesada correctamente: ${fechaStr} -> ${fecha}`);
     return fecha;
 }
 
@@ -65,13 +68,14 @@ async function obtenerDatos() {
     console.log("Primer registro de Supabase:", data[0]);
 
     // Procesar los datos para extraer las salas y procedimientos
-    const df = data.map(row => ({
-        sala: row["Sala de Adquisición"] || row["sala de adquisición"],
-        procedimiento: row["nombre del procedimiento"] || row["Nombre del procedimiento"]
-    })).filter(row => row.sala && row.procedimiento); // Filtrar datos inválidos
+   const df = data.map(row => ({
+    fecha: parseFecha(row["Fecha del procedimiento programado"]?.trim() || row["fecha del procedimiento programado"]?.trim()),
+    procedimiento: row["nombre del procedimiento"]?.trim() || row["Nombre del procedimiento"]?.trim(),
+    sala: row["sala de adquisición"]?.trim() || row["Sala de Adquisición"]?.trim() // Agregando la sala
+})).filter(row => row.fecha !== null && row.procedimiento && row.sala);
 
     console.log("Datos después de conversión:", df);
-
+ 
     // Filtrar los procedimientos de interés
     const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
     const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
@@ -84,15 +88,18 @@ async function obtenerDatos() {
     }
 
     // Agrupar por "Sala de Adquisición" y "Nombre del Procedimiento"
-    const datosAgrupados = dfFiltrado.reduce((acc, row) => {
+    const datosAgrupados = df.reduce((acc, row) => {
         if (!acc[row.sala]) {
             acc[row.sala] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
         }
-        acc[row.sala][row.procedimiento] += 1;
+        if (acc[row.sala][row.procedimiento] !== undefined) {
+            acc[row.sala][row.procedimiento] += 1;
+        }
         return acc;
     }, {});
+    
+    console.log("Datos agrupados por sala:", datosAgrupados);
 
-    console.log("Datos agrupados por Sala de Adquisición:", datosAgrupados);
 
     // Convertir a formato de Chart.js
     const salas = Object.keys(datosAgrupados);
@@ -108,56 +115,40 @@ async function obtenerDatos() {
 }
 
 // Función para graficar los datos como barras agrupadas
-function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
-    console.log("Intentando graficar...");
-    console.log("Salas:", salas);
-    console.log("GASTRODUODENOSCOPIA CDAV:", gastroduodenoscopia);
-    console.log("COLONOSCOPIA CDAV:", colonoscopia);
-
-    if (salas.length === 0 || (gastroduodenoscopia.length === 0 && colonoscopia.length === 0)) {
-        console.warn("No hay datos suficientes para graficar.");
-        return;
-    }
-
-    const canvas = document.getElementById('myChart');
-    if (!canvas) {
-        console.error("No se encontró el <canvas> con id 'myChart'.");
-        return;
-    }
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        console.error("No se pudo obtener el contexto 2D del canvas.");
-        return;
-    }
+function graficarDatos(datosAgrupados) {
+    const ctx = document.getElementById('myChart').getContext('2d');
 
     if (myChart) {
         myChart.destroy();
     }
 
+    const salas = Object.keys(datosAgrupados);
+    const gastroduodenoscopia = salas.map(sala => datosAgrupados[sala]['GASTRODUODENOSCOPIA CDAV'] || 0);
+    const colonoscopia = salas.map(sala => datosAgrupados[sala]['COLONOSCOPIA CDAV'] || 0);
+
     myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: salas, // Eje Y: "Sala de Adquisición"
+            labels: salas,
             datasets: [
                 {
                     label: 'GASTRODUODENOSCOPIA CDAV',
                     data: gastroduodenoscopia,
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
                 },
                 {
                     label: 'COLONOSCOPIA CDAV',
                     data: colonoscopia,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }
             ]
         },
         options: {
-            indexAxis: 'y', // Hace que el gráfico sea horizontal
+            indexAxis: 'y',
             scales: {
                 x: {
                     title: {
@@ -175,8 +166,6 @@ function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
             }
         }
     });
-
-    console.log("Gráfico generado exitosamente.");
 }
 
 // Iniciar la obtención de datos al cargar la página
