@@ -30,27 +30,37 @@ async function obtenerDatos() {
         sala: row["Sala de adquisición"]?.trim()
     })).filter(row => row.fecha && row.procedimiento && row.sala);
 
-    const procedimientosInteres = ['GASTRODUODENOSCOPIA CDAV', 'COLONOSCOPIA CDAV'];
-    const dfFiltrado = df.filter(row => procedimientosInteres.includes(row.procedimiento));
-    if (dfFiltrado.length === 0) return;
+    if (df.length === 0) return;
 
+    // Agrupar por sala y procedimiento
     const datosAgrupados = {};
-    dfFiltrado.forEach(row => {
-        if (!datosAgrupados[row.sala]) datosAgrupados[row.sala] = { 'GASTRODUODENOSCOPIA CDAV': 0, 'COLONOSCOPIA CDAV': 0 };
-        if (datosAgrupados[row.sala][row.procedimiento] !== undefined) {
-            datosAgrupados[row.sala][row.procedimiento] += 1;
+    df.forEach(row => {
+        if (!datosAgrupados[row.sala]) {
+            datosAgrupados[row.sala] = {};
         }
+        if (!datosAgrupados[row.sala][row.procedimiento]) {
+            datosAgrupados[row.sala][row.procedimiento] = 0;
+        }
+        datosAgrupados[row.sala][row.procedimiento] += 1;
     });
 
     const salas = Object.keys(datosAgrupados);
-    const gastroduodenoscopia = salas.map(sala => datosAgrupados[sala]['GASTRODUODENOSCOPIA CDAV'] || 0);
-    const colonoscopia = salas.map(sala => datosAgrupados[sala]['COLONOSCOPIA CDAV'] || 0);
+    const procedimientosUnicos = [...new Set(df.map(row => row.procedimiento))];
 
-    graficarDatos(salas, gastroduodenoscopia, colonoscopia);
+    // Crear datasets para cada procedimiento
+    const datasets = procedimientosUnicos.map(procedimiento => ({
+        label: procedimiento,
+        data: salas.map(sala => datosAgrupados[sala][procedimiento] || 0),
+        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`,
+        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+        borderWidth: 1,
+    }));
+
+    graficarDatos(salas, datasets);
 }
 
 // Función para graficar los datos
-function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
+function graficarDatos(salas, datasets) {
     const ctx = document.getElementById('myChart')?.getContext('2d');
     if (!ctx) return;
 
@@ -60,22 +70,7 @@ function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
         type: "bar",
         data: {
             labels: salas,
-            datasets: [
-                {
-                    label: "GASTRODUODENOSCOPIA CDAV",
-                    data: gastroduodenoscopia,
-                    backgroundColor: "rgba(54, 162, 235, 0.5)",
-                    borderColor: "rgba(54, 162, 235, 1)",
-                    borderWidth: 1,
-                },
-                {
-                    label: "COLONOSCOPIA CDAV",
-                    data: colonoscopia,
-                    backgroundColor: "rgba(255, 99, 132, 0.5)",
-                    borderColor: "rgba(255, 99, 132, 1)",
-                    borderWidth: 1,
-                },
-            ],
+            datasets: datasets
         },
         options: {
             responsive: true,
@@ -93,3 +88,4 @@ function graficarDatos(salas, gastroduodenoscopia, colonoscopia) {
 
 // Ejecutar la función cuando el DOM esté cargado
 document.addEventListener("DOMContentLoaded", () => obtenerDatos());
+
