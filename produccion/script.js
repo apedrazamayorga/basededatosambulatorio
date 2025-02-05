@@ -8,6 +8,12 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let myChart = null; // Para evitar superposiciones de gráficos
 
+// Función para convertir fechas en formato 'DD/MM/YYYY' a un objeto Date
+function parseFecha(fechaStr) {
+    const [day, month, year] = fechaStr.split('/');
+    return new Date(year, month - 1, day); // Restamos 1 al mes porque JavaScript usa índices basados en 0
+}
+
 // Función para obtener y procesar los datos
 async function obtenerDatos() {
     const { data, error } = await supabase.from('produccion').select('*');
@@ -21,7 +27,7 @@ async function obtenerDatos() {
 
     // Procesar los datos
     const df = data.map(row => {
-        const fecha = new Date(row["fecha del procedimiento programado"]);
+        const fecha = parseFecha(row["fecha del procedimiento programado"]);
         console.log("Fecha procesada:", fecha);
         return {
             fecha: fecha,
