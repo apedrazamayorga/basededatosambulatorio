@@ -73,7 +73,7 @@ const df = data.map(row => {
 
     const fecha = parseFecha(row["Fecha del procedimiento programado"]?.trim() || row["fecha del procedimiento programado"]?.trim());
     const procedimiento = row["nombre del procedimiento"]?.trim() || row["Nombre del procedimiento"]?.trim();
-    const sala = row["sala de adquisición"]?.trim() || row["Sala de Adquisición"]?.trim();
+    const sala = row["Sala de adquisición"]?.trim() || row["Sala de Adquisición"]?.trim();
 
     console.log("Fecha convertida:", fecha);
     console.log("Procedimiento:", procedimiento);
