@@ -1,7 +1,9 @@
-// Configuración de Supabase
+// Configuración de Supabase (usa variables de entorno en producción)
 const SUPABASE_URL = "https://zlsweremfwlrnkjnpnoj.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3dlcmVtZndscm5ram5wbm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3Nzk1NDQsImV4cCI6MjA1MjM1NTU0NH0.dqnPO5OajQlxxt5gze_uiJk3xDifbNqXtgMP_P4gRR4"; // Usa variables de entorno
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY); // Inicialización correcta
+
+let myChart = null; // Para evitar superposiciones de gráficos
 
 // Función para obtener y procesar los datos
 async function obtenerDatos() {
@@ -15,10 +17,10 @@ async function obtenerDatos() {
         return;
     }
 
-      // Procesar los datos
+    // Procesar los datos
     const df = data.map(row => ({
-        fecha: new Date(row['fecha del procedimiento programado']), // Columna de fecha
-        procedimiento: row['nombre del procedimiento'] // Columna de nombre del procedimiento
+        fecha: new Date(row['fecha_del_procedimiento_programado']), // Verifica nombres
+        procedimiento: row['nombre_del_procedimiento'] // Verifica nombres
     }));
 
     // Filtrar solo los procedimientos que nos interesan
@@ -49,15 +51,19 @@ async function obtenerDatos() {
 
 // Función para obtener el número de semana del año
 function getWeek(date) {
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date - startOfYear) / 86400000;
-    return Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+    return new Intl.DateTimeFormat('en', { week: 'numeric' }).format(date);
 }
 
 // Función para graficar los datos con Chart.js
 function graficarDatos(semanas, gastroduodenoscopia, colonoscopia) {
     const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
+
+    // Destruir el gráfico anterior si existe
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: semanas,
